@@ -1,27 +1,83 @@
-function Gameboard() {
-    let gameboard = [];
+function gameboardController() { // This is a candidate for an IIFE
+    let board = [];
     const numOfSpaces = 9;
     
     for (let i = 0; i < numOfSpaces; i++) {
-        gameboard.push('');
+        board.push('');
     }
 
-    return {gameboard}; // this is a candidate for an IIFE
-}
+    const getBoard = () => board;
 
-function Players(name, marker) {
+    const updateBoard = (index, marker) => {
+        board[index] = marker;
+    }
+
     return {
-        name,
-        marker,
+        getBoard, 
+        updateBoard,
+    };      
+}
+
+function playerController() { // I don't think this can be an IIFE if I want to createPlayer twice
+    const createPlayer = (name, marker) => {
+        return {
+            name,
+            marker,
+        }
     }
-}
 
-const player1 = Players('Taylor', 'X'); // Can create these in console later. Can be created within another function.
-const player2 = Players('Alex', 'O');   // Then can get the names from user input when UI is added.
-
-function gameController(index) {
+    let activePlayer = player1;
     
+    // each time a marker is placed, toggle active player
+    
+    const toggleActivePlayer = () => {
+        activePlayer = (activePlayer === player1) ? player2 : player1;
+    }
+
+    const getActivePlayer = () => activePlayer;
+
+    return {
+        createPlayer,
+        toggleActivePlayer,
+        getActivePlayer,
+    }
+
 }
+
+
+function gameController() {
+    let board = gameboardController();
+    const players = playerController(); // could skip by changing playercontroller to function expression called players.
+    
+    const player1 = players.createPlayer('Taylor', 'X'); // Can create these in console later. Can be created within another function.
+    const player2 = players.createPlayer('Alex', 'O');   // Then can get the names from user input when UI is added.
+
+
+
+    function placeMarker() {
+        
+        // get the board
+        // get active player
+        // tell active player it's their turn
+        // if player1, X. if player2, O.
+        // update board
+        // toggle active player
+    }
+
+
+    // function updateBoard(index) {
+    //     get
+    // }
+}
+
+
+
+
+
+
+
+
+
 
 // Things needed:
     // gameboard
