@@ -26,25 +26,9 @@ function playerController() { // I don't think this can be an IIFE if I want to 
         }
     }
 
-    let activePlayer = player1;         // all this stuff should be in gamecontroller?
-    // const setPlayer1 = () => {
-    //     let activePlayer = player1;
-    //     return activePlayer;
-    // }
-    
-    const getActivePlayer = () => activePlayer;
-    
-    // each time a marker is placed, toggle active player
-    const toggleActivePlayer = () => {
-        activePlayer = (activePlayer === player1) ? player2 : player1;
-    }
-
-
     return {
         createPlayer,
         // setPlayer1,
-        getActivePlayer,
-        toggleActivePlayer,
     }
 
 }
@@ -53,24 +37,34 @@ function playerController() { // I don't think this can be an IIFE if I want to 
 function gameController() {
     const gameboard = gameboardController();
     const players = playerController(); // could skip by changing playercontroller to function expression called players.
-
-
+    
+    
     const player1 = players.createPlayer('Taylor', 'X'); // Can create these in console later. Can be created within another function.
     const player2 = players.createPlayer('Alex', 'O');   // Then can get the names from user input when UI is added.
-    console.log(player1);
+
+    const getActivePlayer = () => activePlayer;
+    
+    // each time a marker is placed, toggle active player
+    const toggleActivePlayer = () => {
+        activePlayer = (activePlayer === player1) ? player2 : player1;
+    }
+    
+    let activePlayer = player1;
 
     // will need function to createPlayer from userinput when we add UI
     // actually, can prob just add a console prompt. Like function playerInput
 
     const placeMarker = (index) => { // this seems liek it should be it's own thing outside of gamecontroller
-        let board = gameboard.getBoard(); // Do I need to do this to utilize updateBoard? // board is already in gameController which I ran so I'm not sure
-        let activePlayer = players.getActivePlayer();
+        let board = gameboard.getBoard();
+        let activePlayer = getActivePlayer();
 
         console.log(`${activePlayer.name}'s turn`);
 
         gameboard.updateBoard(index, activePlayer.marker);
+        console.log(board);
         
-        players.toggleActivePlayer;
+        toggleActivePlayer();
+        console.log(activePlayer);
         
         // get the board
         // set player1
@@ -82,8 +76,12 @@ function gameController() {
 
     return {
         placeMarker,
+        getActivePlayer,
+        toggleActivePlayer,
     }
 }
+
+let test = gameController();
 
 
 
