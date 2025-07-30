@@ -18,7 +18,7 @@ const gameboardController = (function() {
     };      
 })();
 
-function playerController() { // I don't think this can be an IIFE if I want to createPlayer twice
+const playerController = (function() {
     const createPlayer = (name, marker) => {
         return {
             name,
@@ -30,17 +30,17 @@ function playerController() { // I don't think this can be an IIFE if I want to 
         createPlayer,
         // setPlayer1,
     }
+    
+})();
 
-}
 
-
-const gameController = () => {
-    const players = playerController(); // could skip by changing playercontroller to function expression called players.
+const gameController = (function() {
+    // const players = playerController(); // could skip by changing playercontroller to function expression called players.
     
     // will need function to createPlayer from userinput when we add UI
     // actually, can prob just add a console prompt. Like function playerInput
-    const player1 = players.createPlayer('Taylor', 'X'); // Can create these in console later. Can be created within another function.
-    const player2 = players.createPlayer('Alex', 'O');   // Then can get the names from user input when UI is added.
+    const player1 = playerController.createPlayer('Taylor', 'X'); // Can create these in console later. Can be created within another function.
+    const player2 = playerController.createPlayer('Alex', 'O');   // Then can get the names from user input when UI is added.
     let activePlayer = player1;
 
     const getActivePlayer = () => activePlayer; // EXPLORE WHY CAN'T BE FUNCT DECLARATION. MAYBE NEED TO RETURN?
@@ -71,18 +71,12 @@ const gameController = () => {
 
     return {
         placeMarker,
-        getActivePlayer,
-        toggleActivePlayer,
+        getActivePlayer,    // not sure that we need to return this
+        toggleActivePlayer, // not sure that we need to return this
     }
-}
+})();
 
-let test = gameController();
-
-
-// to play, test.placeMarker(index)
-// or can initialize by doing gameController...
-    // or, make it an IIFE then we can just do gameController.placeMarker(index);
-
+// to play, gameController.placeMarker(index)
 
 
 
