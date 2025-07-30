@@ -1,4 +1,4 @@
-function gameboardController() { // This is a candidate for an IIFE
+const gameboardController = (function() {
     let board = [];
     const numOfSpaces = 9;
     
@@ -16,7 +16,7 @@ function gameboardController() { // This is a candidate for an IIFE
         getBoard, 
         updateBoard,
     };      
-}
+})();
 
 function playerController() { // I don't think this can be an IIFE if I want to createPlayer twice
     const createPlayer = (name, marker) => {
@@ -34,33 +34,28 @@ function playerController() { // I don't think this can be an IIFE if I want to 
 }
 
 
-function gameController() {
-    const gameboard = gameboardController();
+const gameController = () => {
     const players = playerController(); // could skip by changing playercontroller to function expression called players.
     
-    
+    // will need function to createPlayer from userinput when we add UI
+    // actually, can prob just add a console prompt. Like function playerInput
     const player1 = players.createPlayer('Taylor', 'X'); // Can create these in console later. Can be created within another function.
     const player2 = players.createPlayer('Alex', 'O');   // Then can get the names from user input when UI is added.
+    let activePlayer = player1;
 
-    const getActivePlayer = () => activePlayer;
+    const getActivePlayer = () => activePlayer; // EXPLORE WHY CAN'T BE FUNCT DECLARATION. MAYBE NEED TO RETURN?
     
-    // each time a marker is placed, toggle active player
     const toggleActivePlayer = () => {
         activePlayer = (activePlayer === player1) ? player2 : player1;
     }
     
-    let activePlayer = player1;
-
-    // will need function to createPlayer from userinput when we add UI
-    // actually, can prob just add a console prompt. Like function playerInput
-
     const placeMarker = (index) => { // this seems liek it should be it's own thing outside of gamecontroller
-        let board = gameboard.getBoard();
+        let board = gameboardController.getBoard();
         let activePlayer = getActivePlayer();
 
-        console.log(`${activePlayer.name}'s turn`);
+        console.log(`${activePlayer.name}'s turn`); // Is player1. Should be player2.
 
-        gameboard.updateBoard(index, activePlayer.marker);
+        gameboardController.updateBoard(index, activePlayer.marker);
         console.log(board);
         
         toggleActivePlayer();
@@ -84,8 +79,7 @@ function gameController() {
 let test = gameController();
 
 
-
-// to play, gameController().placeMarker(index)
+// to play, test.placeMarker(index)
 // or can initialize by doing gameController...
     // or, make it an IIFE then we can just do gameController.placeMarker(index);
 
