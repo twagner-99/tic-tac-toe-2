@@ -18,7 +18,7 @@ const gameboardController = (function() {
     };      
 })();
 
-const playerController = (function() {
+const playerController = (function() {    
     const createPlayer = (name, marker) => {
         return {
             name,
@@ -26,41 +26,35 @@ const playerController = (function() {
         }
     }
 
-    return {
-        createPlayer,
-        // setPlayer1,
-    }
-    
-})();
-
-
-const gameController = (function() {
-    // const players = playerController(); // could skip by changing playercontroller to function expression called players.
-    
-    // will need function to createPlayer from userinput when we add UI
-    // actually, can prob just add a console prompt. Like function playerInput
-    const player1 = playerController.createPlayer('Taylor', 'X'); // Can create these in console later. Can be created within another function.
-    const player2 = playerController.createPlayer('Alex', 'O');   // Then can get the names from user input when UI is added.
+    const player1 = createPlayer('Taylor', 'X'); // Can create these in console later. Can be created within another function.
+    const player2 = createPlayer('Alex', 'O');   // Then can get the names from user input when UI is added.
     let activePlayer = player1;
+
+    console.log(`${activePlayer.name}'s turn`);
 
     const getActivePlayer = () => activePlayer; // EXPLORE WHY CAN'T BE FUNCT DECLARATION. MAYBE NEED TO RETURN?
     
     const toggleActivePlayer = () => {
         activePlayer = (activePlayer === player1) ? player2 : player1;
     }
+
+    return {
+        createPlayer,
+        getActivePlayer,
+        toggleActivePlayer,
+    }
     
-    const placeMarker = (index) => { // this seems liek it should be it's own thing outside of gamecontroller
-        let board = gameboardController.getBoard();
-        let activePlayer = getActivePlayer();
+})();
 
-        console.log(`${activePlayer.name}'s turn`); // Is player1. Should be player2.
 
-        gameboardController.updateBoard(index, activePlayer.marker);
-        console.log(board);
+const gameController = (function() {    
+    const placeMarker = (index) => {
+        gameboardController.updateBoard(index, playerController.getActivePlayer().marker);
         
-        toggleActivePlayer();
-        console.log(activePlayer);
+        playerController.toggleActivePlayer();
         
+        console.log(`${playerController.getActivePlayer().name}'s turn`); // Is player1. Should be player2.
+
         // get the board
         // set player1
         // get active player
@@ -69,16 +63,18 @@ const gameController = (function() {
         // toggle active player
     }
 
+    const playRound = () => {
+
+    }
+
     return {
         placeMarker,
-        getActivePlayer,    // not sure that we need to return this
-        toggleActivePlayer, // not sure that we need to return this
     }
 })();
 
 // to play, gameController.placeMarker(index)
 
-
+// create playRound function that places marker, creates player, toggles, etc?
 
 
 
