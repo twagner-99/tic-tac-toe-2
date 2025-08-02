@@ -13,7 +13,7 @@ const gameboardController = (function() {
     }
 
     return {
-        getBoard, 
+        getBoard, // I'm not actually using this anywhere... might need to for display??
         updateBoard,
     };      
 })();
@@ -49,12 +49,19 @@ const playerController = (function() {
 
 const gameController = (function() {    
     const placeMarker = (index) => {
-        gameboardController.updateBoard(index, playerController.getActivePlayer().marker);
-        
-        playerController.toggleActivePlayer();
-        
-        console.log(`${playerController.getActivePlayer().name}'s turn`); // Is player1. Should be player2.
+        if (!gameboardController.getBoard()[index]) { // If value at index is empty string, do stuff
+            gameboardController.updateBoard(index, playerController.getActivePlayer().marker);
+            playerController.toggleActivePlayer();
 
+            console.log(gameboardController.getBoard());
+
+            console.log(`${playerController.getActivePlayer().name}'s turn`);
+        }
+
+        else {
+            console.log('Space already occupied, go again.');
+        }
+        
         // get the board
         // set player1
         // get active player
@@ -63,13 +70,24 @@ const gameController = (function() {
         // toggle active player
     }
 
+    // const winChecker = (index) => {
+    //     gameboardController.getBoard(index) !== 
+    // }
+
+
     const playRound = () => {
+        placeMarker();
+
+        // if space is taken, no-go and warning
+        // if three in a row, announce winner
+            // should both of these be their own functions within gameController?
 
     }
 
     return {
         placeMarker,
     }
+
 })();
 
 // to play, gameController.placeMarker(index)
