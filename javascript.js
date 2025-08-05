@@ -1,15 +1,19 @@
 const gameboardController = (function() {
     let board = [];
-    const numOfSpaces = 9;
+    const rows = 3;
+    const columns = 3;
     
-    for (let i = 0; i < numOfSpaces; i++) {
-        board.push('');
+    for (let i = 0; i < rows; i++) {
+        board[i] = [];
+        for (let j = 0; j < columns; j++) {
+            board[i].push('');
+        }
     }
 
     const getBoard = () => board;
 
-    const updateBoard = (index, marker) => {
-        board[index] = marker;
+    const updateBoard = (row, column, marker) => {
+        board[row][column] = marker;
     }
 
     return {
@@ -48,9 +52,9 @@ const playerController = (function() {
 
 
 const gameController = (function() {    
-    const placeMarker = (index) => {
-        if (!gameboardController.getBoard()[index]) { // If value at index is empty string, do stuff
-            gameboardController.updateBoard(index, playerController.getActivePlayer().marker);
+    const placeMarker = (row, column) => {
+        if (!gameboardController.getBoard()[row][column]) { // If value at index is empty string, do stuff
+            gameboardController.updateBoard(row, column, playerController.getActivePlayer().marker);
             playerController.toggleActivePlayer();
 
             console.log(gameboardController.getBoard());
@@ -61,24 +65,17 @@ const gameController = (function() {
         else {
             console.log('Space already occupied, go again.');
         }
-        
-        // get the board
-        // set player1
-        // get active player
-        // tell active player it's their turn
-        // update board. if player1, X. if player2, O.
-        // toggle active player
     }
 
-    // const winChecker = (index) => {
-    //     gameboardController.getBoard(index) !== 
-    // }
+    const winChecker = (index) => {
+
+    }
 
 
     const playRound = () => {
         placeMarker();
 
-        // if space is taken, no-go and warning
+        // if space is taken, no-go and warning DONE, IN PLACEMARKER
         // if three in a row, announce winner
             // should both of these be their own functions within gameController?
 
@@ -90,7 +87,7 @@ const gameController = (function() {
 
 })();
 
-// to play, gameController.placeMarker(index)
+// to play, gameController.placeMarker(row, column)
 
 // create playRound function that places marker, creates player, toggles, etc?
 
@@ -118,4 +115,68 @@ const gameController = (function() {
                 // 3, 4, 5
                 // 6, 7, 8
             // I can hard code these win conditiions... or check my array methods maybe there's something better
-    // Could everything go into the gameplay function as an IIFE?
+    
+    // // 1D ARRAY BRAINSTORM
+    // let board = [0, 1, 2,
+    //              3, 4, 5, 
+    //              6, 7, 8]
+    
+    // // DOWN
+    //     // 0, 1, 2 plus three = win
+    // // ACROSS
+    //     // 0, 3, 6 plus one = win
+    // // DIAG
+    //     // 0 plus four = win
+    //     // 2 plus two = win
+
+    // // 2D ARRAY BRAINSTORM
+    //     let board = [[0, 1, 2], [0, 1, 2], [0, 1, 2]]
+
+    //     let board = [
+    //         [0, 1, 2],
+    //         [0, 1, 2],
+    //         [0, 1, 2]
+    //     ]
+
+    //     let test = board[0][0]
+    //     board.forEach((item) => {
+    //         board.forEach((item) => {
+    //             if test === X or O
+    //             let test === item
+    //         })
+
+    //         return winner
+    //     })
+
+    //     // DOWN
+    //     for (let i = 0; i < ; i++)
+    //         for (let j = 0; j < ; j++)
+    //             board[j][i]
+
+    //     // ACROSS
+    //     for (let i = 0; i < ; i++)
+    //         for (let j = 0; j < ; j++)
+    //             board[i][j]
+
+    //     // DIAG
+    //     for (let i = 0; i < ; i++)
+    //         for (let j = 0; j < ; j++)
+    //             board[i + 1][j]
+
+    //     forEach
+    //         let i = 0
+
+
+    // // DOWN, EVERY LAST IS SAME
+    //     [0][0] & [1][0] & [2][0]
+    //     [0][1] & [1][1] & [2][1]
+    //     [0][2] & [1][2] & [2][2]
+
+    // // ACROSS, EVERY FIRST IS SAME
+    //     [0][0] & [0][1] & [0][2]
+    //     [1][0] & [1][1] & [1][2]
+    //     [2][0] & [2][1] & [2][2]
+
+    // // DIAGONAL
+    //     [0][0] & [1][1] & [2][2]
+    //     [2][0] & [1][1] & [0][2]
