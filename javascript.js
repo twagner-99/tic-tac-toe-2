@@ -16,9 +16,53 @@ const gameboardController = (function() {
         board[row][column] = marker;
     }
 
+    const winChecker = () => {
+        // DOWN
+        // for (let j = 0; j < columns; j++) {
+        //     for (let i = 0; i < rows; i++) {
+        //         board[i][j]
+        //     }
+        // }
+
+        // ACROSS
+        for (let i = 0; i < rows; i++) {
+            let markerCount = 0;
+            let currentMarker = board[i][0];
+            // let winnerChosen = false;
+            for (let j = 0; j < columns; j++) {
+                if (!!currentMarker && currentMarker === board[i][j]) {               // If value at index is empty string, do stuff
+                    currentMarker = board[i][j];
+                    markerCount++;
+
+                    if (markerCount === columns) {
+                        // winnerChosen = true;
+                        // console.log(`${playerController.getActivePlayer().name} wins!`);
+                        return true;
+                    }
+                }
+                
+                else {
+                    break;
+                }
+
+            }
+        }
+
+        // DIAG
+        // for (let i = 0; i < rows; i++) {
+        //     for (let j = 0; j < columns; j++) {
+        //         board[i + 1][j]
+        //     }
+
+        // forEach
+        //     let i = 0
+        // }
+    }
+
     return {
-        getBoard, // I'm not actually using this anywhere... might need to for display??
+        getBoard,
         updateBoard,
+        winChecker,
     };      
 })();
 
@@ -55,11 +99,8 @@ const gameController = (function() {
     const placeMarker = (row, column) => {
         if (!gameboardController.getBoard()[row][column]) { // If value at index is empty string, do stuff
             gameboardController.updateBoard(row, column, playerController.getActivePlayer().marker);
-            playerController.toggleActivePlayer();
 
             console.log(gameboardController.getBoard());
-
-            console.log(`${playerController.getActivePlayer().name}'s turn`);
         }
 
         else {
@@ -67,27 +108,28 @@ const gameController = (function() {
         }
     }
 
-    const winChecker = (index) => {
+    const playRound = (row, column) => {
+        placeMarker(row, column);
+        gameboardController.winChecker();
 
+        if (!gameboardController.winChecker()) {
+            playerController.toggleActivePlayer();
+            console.log(`${playerController.getActivePlayer().name}'s turn`);
+        }
+
+        else {
+            console.log(`${playerController.getActivePlayer().name} wins!`);
+        }
     }
-
-
-    const playRound = () => {
-        placeMarker();
-
-        // if space is taken, no-go and warning DONE, IN PLACEMARKER
-        // if three in a row, announce winner
-            // should both of these be their own functions within gameController?
-
-    }
-
     return {
         placeMarker,
+        playRound,
     }
 
 })();
 
 // to play, gameController.placeMarker(row, column)
+// gameController.playRound(row, column)
 
 // create playRound function that places marker, creates player, toggles, etc?
 
