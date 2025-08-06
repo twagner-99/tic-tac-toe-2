@@ -148,6 +148,7 @@ const gameController = (function() {
 
         else {
             console.log('Space already occupied, go again.');
+            playerController.toggleActivePlayer();
         }
     }
 
