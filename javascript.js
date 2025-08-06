@@ -18,25 +18,35 @@ const gameboardController = (function() {
 
     const winChecker = () => {
         // DOWN
-        // for (let j = 0; j < columns; j++) {
-        //     for (let i = 0; i < rows; i++) {
-        //         board[i][j]
-        //     }
-        // }
+        for (let j = 0; j < columns; j++) {
+            let markerCount = 0;                    // Can repeat these variable names b/c of block scope, but not sure if it's good practice. 
+            let currentMarker = board[0][j];        // May be better to delineate (like markerCountDown) for debugging purposes...
+            for (let i = 0; i < rows; i++) {
+                if (!!currentMarker && currentMarker === board[i][j]) {               // If value at index is empty string, do stuff
+                    currentMarker = board[i][j];
+                    markerCount++;
+
+                    if (markerCount === rows) {
+                        return true;
+                    }
+                }
+                
+                else {
+                    break;
+                }
+            }
+        }
 
         // ACROSS
         for (let i = 0; i < rows; i++) {
             let markerCount = 0;
             let currentMarker = board[i][0];
-            // let winnerChosen = false;
             for (let j = 0; j < columns; j++) {
                 if (!!currentMarker && currentMarker === board[i][j]) {               // If value at index is empty string, do stuff
                     currentMarker = board[i][j];
                     markerCount++;
 
                     if (markerCount === columns) {
-                        // winnerChosen = true;
-                        // console.log(`${playerController.getActivePlayer().name} wins!`);
                         return true;
                     }
                 }
@@ -121,8 +131,8 @@ const gameController = (function() {
             console.log(`${playerController.getActivePlayer().name} wins!`);
         }
     }
+
     return {
-        placeMarker,
         playRound,
     }
 
