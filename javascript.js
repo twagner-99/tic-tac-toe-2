@@ -29,7 +29,7 @@ const gameboardController = (function() {
                     markerCount++;                                              // it will evaluate to truthy.
 
                     if (markerCount === (rowsAndColumnsCount - 1)) {
-                        return true;
+                        return 'win';
                     }
                 }
                 
@@ -52,7 +52,7 @@ const gameboardController = (function() {
                     markerCount++;
 
                     if (markerCount === (rowsAndColumnsCount - 1)) {
-                        return true;
+                        return 'win';
                     }
                 }
                 
@@ -72,7 +72,7 @@ const gameboardController = (function() {
                 markerCountDiag1++;
 
                 if (markerCountDiag1 === (rowsAndColumnsCount - 1)) {
-                    return true;
+                    return 'win';
                 }
             }
             
@@ -91,7 +91,7 @@ const gameboardController = (function() {
                 markerCountDiag2++;
 
                 if (markerCountDiag2 === (rowsAndColumnsCount - 1)) {
-                    return true;
+                    return 'win';
                 }
             }
             
@@ -99,6 +99,36 @@ const gameboardController = (function() {
                 break;
             }
         }
+
+        // TIE
+        let markerCountTie = 0;
+        for (let i = 0; i < rowsAndColumnsCount; i++) {
+            let currentMarker = board[i][0];
+            for (let j = 0; j < (rowsAndColumnsCount - 1); j++) {
+                if (!!currentMarker) {                              // If current spot is NOT an empty string (aka an 'X' or 'O'), do stuff.
+                    currentMarker = board[i][j + 1];
+
+                    if (!currentMarker) {                           // If current spot is an empty string, break.
+                        break;
+                    }
+
+                    else {
+                        markerCountTie++;
+
+                        if (markerCountTie === ((rowsAndColumnsCount * rowsAndColumnsCount) - rowsAndColumnsCount)) {  // Total grid size minus the first row since the first comparison of each row doesn't contribute towards the count.
+                            return 'tie';
+                        }
+                    }
+
+                }
+                
+                else {
+                    break;
+                }
+            }
+        }
+
+        // Can I do a nested forEach instead??? or for... of
     }
 
     return {
@@ -117,7 +147,7 @@ const playerController = (function() {
     }
 
     const player1 = createPlayer('Taylor', 'X'); // Can create these in console later. Can be created within another function.
-    const player2 = createPlayer('Alex', 'O');   // Then can get the names from user input when UI is added.
+    const player2 = createPlayer('Alex', 'P');   // Then can get the names from user input when UI is added.
     let activePlayer = player1;
 
     console.log(`${activePlayer.name}'s turn`);
@@ -155,11 +185,22 @@ const gameController = (function() {
         placeMarker(row, column);
         gameboardController.winChecker();
 
-        if (gameboardController.winChecker()) {
+        if (gameboardController.winChecker() === 'win') {         // If a winner is found, winChecker returns true so code will run.
             console.log(`${playerController.getActivePlayer().name} wins!`);
         }
         
-        else {
+        else if (gameboardController.winChecker() === 'tie') {   // If a tie, winChecker returns false so code will run (b/c !). DOESN'T WORK BECAUSE IF NO WINNER NOT OR IS FOUND, WINCHECKER RETURNS UNDEFINED WHICH IS FALSY....
+            console.log(`It's a tie!`);
+            // Need to add something to play again.
+            // Should all these console.logs be in the win checker? Have win checker return
+            // Make something called win messages?
+            // console.log(gameboardController.winMessages())??
+            // in winChecker, we could have variable called win message that gets updated depending on what happens
+            // Variable updated and is returned within if statement if a condition is met
+            // But, if it gets to end, message would be updated to it's players turn and returned
+        }
+        
+        else {                                          // If a winner is not found, winChecker doesn't return anything, so code will run.
             playerController.toggleActivePlayer();
             console.log(`${playerController.getActivePlayer().name}'s turn`);
         }
@@ -172,3 +213,13 @@ const gameController = (function() {
 })();
 
 // to play, gameController.playRound(row, column)
+
+// gameController.playRound(0, 0)
+// gameController.playRound(0, 1)
+// gameController.playRound(0, 2)
+// gameController.playRound(1, 1)
+// gameController.playRound(1, 0)
+// gameController.playRound(1, 2)
+// gameController.playRound(2, 2)
+// gameController.playRound(2, 0)
+// gameController.playRound(2, 1)
