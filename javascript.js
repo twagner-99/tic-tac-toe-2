@@ -1,11 +1,10 @@
 const gameboardController = (function() {
     let board = [];
-    const rows = 3;
-    const columns = 3;
+    const rowsAndColumnsCount = 3;
     
-    for (let i = 0; i < rows; i++) {
+    for (let i = 0; i < rowsAndColumnsCount; i++) {
         board[i] = [];
-        for (let j = 0; j < columns; j++) {
+        for (let j = 0; j < rowsAndColumnsCount; j++) {
             board[i].push('');
         }
     }
@@ -21,15 +20,15 @@ const gameboardController = (function() {
             // [0][0] & [1][0] & [2][0]
             // [0][1] & [1][1] & [2][1]
             // [0][2] & [1][2] & [2][2]
-        for (let j = 0; j < columns; j++) {
+        for (let j = 0; j < rowsAndColumnsCount; j++) {
             let markerCount = 0;              // Can repeat these variable names b/c of block scope, but not sure if it's good practice. 
             let currentMarker = board[0][j];  // May be better to delineate (like markerCountDown) for debugging purposes...
-            for (let i = 0; i < (rows - 1); i++) {  // End condition doesn't really matter b/c it'll either break or end/return true
+            for (let i = 0; i < (rowsAndColumnsCount - 1); i++) {  // End condition doesn't really matter b/c it'll either break or end/return true
                 if (!!currentMarker && currentMarker === board[i + 1][j]) {     // If current spot is NOT an empty string (aka an 'X' or 'O'), do stuff.
                     currentMarker = board[i + 1][j];                            // If it's an empty string, it'll evaluate to falsy. If it's an 'X' or 'O'
                     markerCount++;                                              // it will evaluate to truthy.
 
-                    if (markerCount === (rows - 1)) {
+                    if (markerCount === (rowsAndColumnsCount - 1)) {
                         return true;
                     }
                 }
@@ -44,15 +43,15 @@ const gameboardController = (function() {
             // [0][0] & [0][1] & [0][2]
             // [1][0] & [1][1] & [1][2]
             // [2][0] & [2][1] & [2][2]
-        for (let i = 0; i < rows; i++) {
+        for (let i = 0; i < rowsAndColumnsCount; i++) {
             let markerCount = 0;
             let currentMarker = board[i][0];
-            for (let j = 0; j < (columns - 1); j++) {
+            for (let j = 0; j < (rowsAndColumnsCount - 1); j++) {
                 if (!!currentMarker && currentMarker === board[i][j + 1]) {
                     currentMarker = board[i][j + 1];
                     markerCount++;
 
-                    if (markerCount === (columns - 1)) {
+                    if (markerCount === (rowsAndColumnsCount - 1)) {
                         return true;
                     }
                 }
@@ -66,13 +65,13 @@ const gameboardController = (function() {
         // DIAGONAL-1
             // [0][0] & [1][1] & [2][2]
         let markerCountDiag1 = 0;
-        for (let i = 0, j = 0; i < (rows - 1); i++, j++) {
+        for (let i = 0, j = 0; i < (rowsAndColumnsCount - 1); i++, j++) {
             let currentMarker = board[i][j];
             if (!!currentMarker && currentMarker === board[i + 1][j + 1]) {
                 currentMarker = board[i + 1][j + 1];
                 markerCountDiag1++;
 
-                if (markerCountDiag1 === (rows - 1)) {
+                if (markerCountDiag1 === (rowsAndColumnsCount - 1)) {
                     return true;
                 }
             }
@@ -85,13 +84,13 @@ const gameboardController = (function() {
         // DIAGONAL-2
             // [2][0] & [1][1] & [0][2]
         let markerCountDiag2 = 0;
-        for (let i = 2, j = 0; j < (columns - 1); i--, j++) {
+        for (let i = 2, j = 0; j < (rowsAndColumnsCount - 1); i--, j++) {
             let currentMarker = board[i][j];
             if (!!currentMarker && currentMarker === board[i - 1][j + 1]) {
                 currentMarker = board[i - 1][j + 1];
                 markerCountDiag2++;
 
-                if (markerCountDiag2 === (rows - 1)) {
+                if (markerCountDiag2 === (rowsAndColumnsCount - 1)) {
                     return true;
                 }
             }
