@@ -22,14 +22,14 @@ const gameboardController = (function() {
             // [0][1] & [1][1] & [2][1]
             // [0][2] & [1][2] & [2][2]
         for (let j = 0; j < columns; j++) {
-            let markerCount = 0;                    // Can repeat these variable names b/c of block scope, but not sure if it's good practice. 
-            let currentMarker = board[0][j];        // May be better to delineate (like markerCountDown) for debugging purposes...
-            for (let i = 0; i < rows; i++) {
-                if (!!currentMarker && currentMarker === board[i][j]) { // If current spot is not an empty string, DO STUFF. I THINK this works this way b/c if statements converT to boolean.
-                    currentMarker = board[i][j];                        // !!'' evaluates to false. So if we have an empty string and we have !!'' evaluating to false
-                    markerCount++;                                      // then the if statment says, "yes it's true that !!'' is false" so it runs the code with &&
+            let markerCount = 0;              // Can repeat these variable names b/c of block scope, but not sure if it's good practice. 
+            let currentMarker = board[0][j];  // May be better to delineate (like markerCountDown) for debugging purposes...
+            for (let i = 0; i < (rows - 1); i++) {  // End condition doesn't really matter b/c it'll either break or end/return true
+                if (!!currentMarker && currentMarker === board[i + 1][j]) {     // If current spot is NOT an empty string (aka an 'X' or 'O'), do stuff.
+                    currentMarker = board[i + 1][j];                            // If it's an empty string, it'll evaluate to falsy. If it's an 'X' or 'O'
+                    markerCount++;                                              // it will evaluate to truthy.
 
-                    if (markerCount === rows) {
+                    if (markerCount === (rows - 1)) {
                         return true;
                     }
                 }
@@ -47,12 +47,12 @@ const gameboardController = (function() {
         for (let i = 0; i < rows; i++) {
             let markerCount = 0;
             let currentMarker = board[i][0];
-            for (let j = 0; j < columns; j++) {
-                if (!!currentMarker && currentMarker === board[i][j]) { // change to j + 1 to avoid comparing against self? Would need to update markerCount formula.
-                    currentMarker = board[i][j];                        // Not sure if one is preferred over the other... the j+1 version might be more clear
+            for (let j = 0; j < (columns - 1); j++) {
+                if (!!currentMarker && currentMarker === board[i][j + 1]) {
+                    currentMarker = board[i][j + 1];
                     markerCount++;
 
-                    if (markerCount === columns) {
+                    if (markerCount === (columns - 1)) {
                         return true;
                     }
                 }
@@ -140,7 +140,7 @@ const playerController = (function() {
 
 const gameController = (function() {    
     const placeMarker = (row, column) => {
-        if (!gameboardController.getBoard()[row][column]) { // If value at index is empty string, do stuff
+        if (!gameboardController.getBoard()[row][column]) { // If value is empty string, do stuff
             gameboardController.updateBoard(row, column, playerController.getActivePlayer().marker);
 
             console.log(gameboardController.getBoard());
@@ -161,7 +161,7 @@ const gameController = (function() {
         }
         
         else {
-            playerController.toggleActivePlayer();  // need to change so it doesn't toggle if player goes in occupied space
+            playerController.toggleActivePlayer();
             console.log(`${playerController.getActivePlayer().name}'s turn`);
         }
     }
