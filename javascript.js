@@ -15,20 +15,23 @@ const gameboardController = (function() {
         board[row][column] = marker;
     }
 
-    const winChecker = () => {  // I defined this here b/c that's where the rows and columns are defined. If I put it under gameController, I would need to re-access the rows and columns variables or read the board again to get that info. Felt cleaner to do it this way.
-        // DOWN - NOT SURE HOW I COULD IMPLEMENT THIS USING A FOREACH OR FOR ...OF LOOP
-            // [0][0] & [1][0] & [2][0]
-            // [0][1] & [1][1] & [2][1]
-            // [0][2] & [1][2] & [2][2]
-        for (let j = 0; j < rowsAndColumnsCount; j++) {
-            let markerCount = 0;              // Can repeat these variable names b/c of block scope, but not sure if it's good practice. 
-            let currentMarker = board[0][j];  // May be better to delineate (like markerCountDown) for debugging purposes...
-            for (let i = 0; i < (rowsAndColumnsCount - 1); i++) {  // End condition doesn't really matter b/c it'll either break or end/return true
-                if (!!currentMarker && currentMarker === board[i + 1][j]) {     // If current spot is NOT an empty string (aka an 'X' or 'O'), do stuff.
-                    currentMarker = board[i + 1][j];                            // If it's an empty string, it'll evaluate to falsy. If it's an 'X' or 'O'
-                    markerCount++;                                              // it will evaluate to truthy.
+    const winChecker = () => {  
+        // I defined this here b/c that's where the rows and columns are defined. 
+        // If I put it under gameController, I would need to re-access the rows
+        // and columns variables or read the board again to get that info. Felt 
+        // cleaner to do it this way. And kind of makes sense... winChecker is 
+        // a gameboard reader so it makes sense under gameboardController
 
-                    if (markerCount === (rowsAndColumnsCount - 1)) {
+        // DOWN
+        for (let j = 0; j < rowsAndColumnsCount; j++) {
+            let markerCountDown = 0;
+            let currentMarker = board[0][j];
+            for (let i = 0; i < (rowsAndColumnsCount - 1); i++) {
+                if (!!currentMarker && currentMarker === board[i + 1][j]) {
+                    currentMarker = board[i + 1][j];
+                    markerCountDown++;
+
+                    if (markerCountDown === (rowsAndColumnsCount - 1)) {
                         return 'win';
                     }
                 }
@@ -39,19 +42,16 @@ const gameboardController = (function() {
             }
         }
 
-        // ACROSS - COULD EASILY BE DONE WITH FOREACH OR FOR ...OF LOOP
-            // [0][0] & [0][1] & [0][2]
-            // [1][0] & [1][1] & [1][2]
-            // [2][0] & [2][1] & [2][2]
+        // ACROSS
         for (let i = 0; i < rowsAndColumnsCount; i++) {
-            let markerCount = 0;
+            let markerCountAcross = 0;
             let currentMarker = board[i][0];
             for (let j = 0; j < (rowsAndColumnsCount - 1); j++) {
                 if (!!currentMarker && currentMarker === board[i][j + 1]) {
                     currentMarker = board[i][j + 1];
-                    markerCount++;
+                    markerCountAcross++;
 
-                    if (markerCount === (rowsAndColumnsCount - 1)) {
+                    if (markerCountAcross === (rowsAndColumnsCount - 1)) {
                         return 'win';
                     }
                 }
@@ -62,7 +62,7 @@ const gameboardController = (function() {
             }
         }
 
-        // DIAGONAL-1 - NOT SURE HOW I COULD IMPLEMENT THIS USING A FOREACH OR FOR ...OF LOOP
+        // DIAGONAL-1
             // [0][0] & [1][1] & [2][2]
         let markerCountDiag1 = 0;
         for (let i = 0, j = 0; i < (rowsAndColumnsCount - 1); i++, j++) {
@@ -81,7 +81,7 @@ const gameboardController = (function() {
             }
         }
 
-        // DIAGONAL-2 - NOT SURE HOW I COULD IMPLEMENT THIS USING A FOREACH OR FOR ...OF LOOP
+        // DIAGONAL-2
             // [2][0] & [1][1] & [0][2]
         let markerCountDiag2 = 0;
         for (let i = 2, j = 0; j < (rowsAndColumnsCount - 1); i--, j++) {
@@ -100,72 +100,7 @@ const gameboardController = (function() {
             }
         }
 
-        // // TIE - STANDARD FOR LOOP VERSION - ORIGINAL
-        // let markerCountTie = 0;
-        // for (let i = 0; i < rowsAndColumnsCount; i++) {
-        //     let currentMarker = board[i][0];
-        //     for (let j = 0; j < (rowsAndColumnsCount - 1); j++) {
-        //         if (!!currentMarker) {                              // If current spot is NOT an empty string (aka an 'X' or 'O'), do stuff.
-        //             currentMarker = board[i][j + 1];
-
-        //             if (!currentMarker) {                           // If current spot is an empty string, break.
-        //                 break;
-        //             }
-
-        //             else {
-        //                 markerCountTie++;
-
-        //                 if (markerCountTie === ((rowsAndColumnsCount * rowsAndColumnsCount) - rowsAndColumnsCount)) {  // Total grid size minus the first row since the first comparison of each row doesn't contribute towards the count.
-        //                     return 'tie';
-        //                 }
-        //             }
-
-        //         }
-                
-        //         else {
-        //             break;
-        //         }
-        //     }
-        // }
-
-        // // TIE - STANDARD FOR LOOP VERSION - NEW. SIMPLIFIED BY UPDATING IF CONDITION IN SECOND FOR LOOP. LET ME REMOVE ANOTHER IF AND ELSE SET.    
-        // let markerCountTie = 0;
-        // for (let i = 0; i < rowsAndColumnsCount; i++) {
-        //     let currentMarker = board[i][0];
-        //     for (let j = 0; j < (rowsAndColumnsCount - 1); j++) {
-        //         if (!!currentMarker && !!board[i][j + 1]) {      // If current spot is NOT an empty string AND next spot
-        //             currentMarker = board[i][j + 1];             // is NOT an empty string (aka an 'X' or 'O'), do stuff.
-        //             markerCountTie++;
-        //             if (markerCountTie === ((rowsAndColumnsCount * rowsAndColumnsCount) - rowsAndColumnsCount)) {  
-        //                 // Total grid size minus the first row since the first comparison of each row doesn't contribute towards the count.
-        //                 return 'tie';
-        //             }
-
-        //         }
-                
-        //         else {
-        //             break;
-        //         }
-        //     }
-        // }
-
-
-    
-        // // TIE - FOREACH VERSION. NO BREAKS, NOT ALLOWED IN FOREACH.
-        // let markerCountTie = 0;
-        // board.forEach((row) => {
-        //     row.forEach((column) => {
-        //         if (!!column) { // If current spot is NOT an empty string (aka an 'X' or 'O'), do stuff.
-        //             markerCountTie++;
-        //         }
-        //     })
-        // })
-        
-        // if (markerCountTie === (rowsAndColumnsCount * rowsAndColumnsCount)) {
-        //     return 'tie';
-        // }
-
-        // TIE - FOR ...OF LOOP VERSION.
+        // TIE
         let markerCountTie = 0;
         for (let row of board) {
             for (let column of row) {
