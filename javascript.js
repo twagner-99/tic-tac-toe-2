@@ -32,7 +32,7 @@ const gameboardController = (function() {
                     markerCountDown++;
 
                     if (markerCountDown === (rowsAndColumnsCount - 1)) {
-                        return 'win';
+                        return `${playerController.getActivePlayer().name} wins!`;
                     }
                 }
                 
@@ -52,7 +52,7 @@ const gameboardController = (function() {
                     markerCountAcross++;
 
                     if (markerCountAcross === (rowsAndColumnsCount - 1)) {
-                        return 'win';
+                        return `${playerController.getActivePlayer().name} wins!`;
                     }
                 }
                 
@@ -72,7 +72,7 @@ const gameboardController = (function() {
                 markerCountDiag1++;
 
                 if (markerCountDiag1 === (rowsAndColumnsCount - 1)) {
-                    return 'win';
+                    return `${playerController.getActivePlayer().name} wins!`;
                 }
             }
             
@@ -91,7 +91,7 @@ const gameboardController = (function() {
                 markerCountDiag2++;
 
                 if (markerCountDiag2 === (rowsAndColumnsCount - 1)) {
-                    return 'win';
+                    return `${playerController.getActivePlayer().name} wins!`;
                 }
             }
             
@@ -108,7 +108,7 @@ const gameboardController = (function() {
                     markerCountTie++;
 
                     if (markerCountTie === (rowsAndColumnsCount * rowsAndColumnsCount)) {
-                        return 'tie';
+                        return `It's a tie!`;
                     }
                 }
                 
@@ -117,6 +117,12 @@ const gameboardController = (function() {
                 }
             }
         }
+
+        playerController.toggleActivePlayer();
+        return `${playerController.getActivePlayer().name}'s turn`;
+        // Returns message of who won. If nobody wins, it toggles player and says who's turn it is.
+        // This works because it will only ever reach the toggle and "players turn" return
+        // if no winner or tie is found because of all the return statements.
     }
 
     return {
@@ -171,27 +177,24 @@ const gameController = (function() {
 
     const playRound = (row, column) => {
         placeMarker(row, column);
-        let winStatus = gameboardController.winChecker();
+        // let winStatus = gameboardController.winChecker();
 
-        if (winStatus === 'win') {
-            console.log(`${playerController.getActivePlayer().name} wins!`);
-        }
+        console.log(gameboardController.winChecker()); // Returns message of who won. If nobody wins, it toggles player and says who's turn it is.
+
+        // if (winStatus === 'win') {
+        //     console.log(`${playerController.getActivePlayer().name} wins!`);
+        // }
         
-        else if (winStatus === 'tie') {
-            console.log(`It's a tie!`);
-            // Need to add something to play again, like a prompt or play again button that reloads everything
-            // Should all these console.logs be in the win checker? Have win checker return
-            // Make something called win messages?
-            // console.log(gameboardController.winMessages())??
-            // in winChecker, we could have variable called win message that gets updated depending on what happens
-            // Variable updated and is returned within if statement if a condition is met
-            // But, if it gets to end, message would be updated to it's players turn and returned
-        }
+        // else if (winStatus === 'tie') {
+        //     console.log(`It's a tie!`);
+        //     // Need to add something to play again, like a prompt or play 
+        //     // again button that reloads everything
+        // }
         
-        else {
-            playerController.toggleActivePlayer();
-            console.log(`${playerController.getActivePlayer().name}'s turn`);
-        }
+        // else {
+        //     playerController.toggleActivePlayer();
+        //     console.log(`${playerController.getActivePlayer().name}'s turn`);
+        // }
     }
 
     return {
