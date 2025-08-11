@@ -177,24 +177,7 @@ const gameController = (function() {
 
     const playRound = (row, column) => {
         placeMarker(row, column);
-        // let winStatus = gameboardController.winChecker();
-
-        console.log(gameboardController.winChecker()); // Returns message of who won. If nobody wins, it toggles player and says who's turn it is.
-
-        // if (winStatus === 'win') {
-        //     console.log(`${playerController.getActivePlayer().name} wins!`);
-        // }
-        
-        // else if (winStatus === 'tie') {
-        //     console.log(`It's a tie!`);
-        //     // Need to add something to play again, like a prompt or play 
-        //     // again button that reloads everything
-        // }
-        
-        // else {
-        //     playerController.toggleActivePlayer();
-        //     console.log(`${playerController.getActivePlayer().name}'s turn`);
-        // }
+        console.log(gameboardController.winChecker());
     }
 
     return {
