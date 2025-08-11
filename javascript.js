@@ -16,7 +16,7 @@ const gameboardController = (function() {
     }
 
     const winChecker = () => {  // I defined this here b/c that's where the rows and columns are defined. If I put it under gameController, I would need to re-access the rows and columns variables or read the board again to get that info. Felt cleaner to do it this way.
-        // DOWN
+        // DOWN - NOT SURE HOW I COULD IMPLEMENT THIS USING A FOREACH OR FOR ...OF LOOP
             // [0][0] & [1][0] & [2][0]
             // [0][1] & [1][1] & [2][1]
             // [0][2] & [1][2] & [2][2]
@@ -39,7 +39,7 @@ const gameboardController = (function() {
             }
         }
 
-        // ACROSS
+        // ACROSS - COULD EASILY BE DONE WITH FOREACH OR FOR ...OF LOOP
             // [0][0] & [0][1] & [0][2]
             // [1][0] & [1][1] & [1][2]
             // [2][0] & [2][1] & [2][2]
@@ -62,7 +62,7 @@ const gameboardController = (function() {
             }
         }
 
-        // DIAGONAL-1
+        // DIAGONAL-1 - NOT SURE HOW I COULD IMPLEMENT THIS USING A FOREACH OR FOR ...OF LOOP
             // [0][0] & [1][1] & [2][2]
         let markerCountDiag1 = 0;
         for (let i = 0, j = 0; i < (rowsAndColumnsCount - 1); i++, j++) {
@@ -81,7 +81,7 @@ const gameboardController = (function() {
             }
         }
 
-        // DIAGONAL-2
+        // DIAGONAL-2 - NOT SURE HOW I COULD IMPLEMENT THIS USING A FOREACH OR FOR ...OF LOOP
             // [2][0] & [1][1] & [0][2]
         let markerCountDiag2 = 0;
         for (let i = 2, j = 0; j < (rowsAndColumnsCount - 1); i--, j++) {
@@ -100,26 +100,81 @@ const gameboardController = (function() {
             }
         }
 
-        // TIE
+        // // TIE - STANDARD FOR LOOP VERSION - ORIGINAL
+        // let markerCountTie = 0;
+        // for (let i = 0; i < rowsAndColumnsCount; i++) {
+        //     let currentMarker = board[i][0];
+        //     for (let j = 0; j < (rowsAndColumnsCount - 1); j++) {
+        //         if (!!currentMarker) {                              // If current spot is NOT an empty string (aka an 'X' or 'O'), do stuff.
+        //             currentMarker = board[i][j + 1];
+
+        //             if (!currentMarker) {                           // If current spot is an empty string, break.
+        //                 break;
+        //             }
+
+        //             else {
+        //                 markerCountTie++;
+
+        //                 if (markerCountTie === ((rowsAndColumnsCount * rowsAndColumnsCount) - rowsAndColumnsCount)) {  // Total grid size minus the first row since the first comparison of each row doesn't contribute towards the count.
+        //                     return 'tie';
+        //                 }
+        //             }
+
+        //         }
+                
+        //         else {
+        //             break;
+        //         }
+        //     }
+        // }
+
+        // // TIE - STANDARD FOR LOOP VERSION - NEW. SIMPLIFIED BY UPDATING IF CONDITION IN SECOND FOR LOOP. LET ME REMOVE ANOTHER IF AND ELSE SET.    
+        // let markerCountTie = 0;
+        // for (let i = 0; i < rowsAndColumnsCount; i++) {
+        //     let currentMarker = board[i][0];
+        //     for (let j = 0; j < (rowsAndColumnsCount - 1); j++) {
+        //         if (!!currentMarker && !!board[i][j + 1]) {      // If current spot is NOT an empty string AND next spot
+        //             currentMarker = board[i][j + 1];             // is NOT an empty string (aka an 'X' or 'O'), do stuff.
+        //             markerCountTie++;
+        //             if (markerCountTie === ((rowsAndColumnsCount * rowsAndColumnsCount) - rowsAndColumnsCount)) {  
+        //                 // Total grid size minus the first row since the first comparison of each row doesn't contribute towards the count.
+        //                 return 'tie';
+        //             }
+
+        //         }
+                
+        //         else {
+        //             break;
+        //         }
+        //     }
+        // }
+
+
+    
+        // // TIE - FOREACH VERSION. NO BREAKS, NOT ALLOWED IN FOREACH.
+        // let markerCountTie = 0;
+        // board.forEach((row) => {
+        //     row.forEach((column) => {
+        //         if (!!column) { // If current spot is NOT an empty string (aka an 'X' or 'O'), do stuff.
+        //             markerCountTie++;
+        //         }
+        //     })
+        // })
+        
+        // if (markerCountTie === (rowsAndColumnsCount * rowsAndColumnsCount)) {
+        //     return 'tie';
+        // }
+
+        // TIE - FOR ...OF LOOP VERSION.
         let markerCountTie = 0;
-        for (let i = 0; i < rowsAndColumnsCount; i++) {
-            let currentMarker = board[i][0];
-            for (let j = 0; j < (rowsAndColumnsCount - 1); j++) {
-                if (!!currentMarker) {                              // If current spot is NOT an empty string (aka an 'X' or 'O'), do stuff.
-                    currentMarker = board[i][j + 1];
+        for (let row of board) {
+            for (let column of row) {
+                if (!!column) {
+                    markerCountTie++;
 
-                    if (!currentMarker) {                           // If current spot is an empty string, break.
-                        break;
+                    if (markerCountTie === (rowsAndColumnsCount * rowsAndColumnsCount)) {
+                        return 'tie';
                     }
-
-                    else {
-                        markerCountTie++;
-
-                        if (markerCountTie === ((rowsAndColumnsCount * rowsAndColumnsCount) - rowsAndColumnsCount)) {  // Total grid size minus the first row since the first comparison of each row doesn't contribute towards the count.
-                            return 'tie';
-                        }
-                    }
-
                 }
                 
                 else {
@@ -127,8 +182,6 @@ const gameboardController = (function() {
                 }
             }
         }
-
-        // Can I do a nested forEach instead??? or for... of
     }
 
     return {
@@ -147,7 +200,7 @@ const playerController = (function() {
     }
 
     const player1 = createPlayer('Taylor', 'X'); // Can create these in console later. Can be created within another function.
-    const player2 = createPlayer('Alex', 'P');   // Then can get the names from user input when UI is added.
+    const player2 = createPlayer('Alex', 'O');   // Then can get the names from user input when UI is added.
     let activePlayer = player1;
 
     console.log(`${activePlayer.name}'s turn`);
@@ -183,15 +236,15 @@ const gameController = (function() {
 
     const playRound = (row, column) => {
         placeMarker(row, column);
-        gameboardController.winChecker();
+        let winStatus = gameboardController.winChecker();
 
-        if (gameboardController.winChecker() === 'win') {         // If a winner is found, winChecker returns true so code will run.
+        if (winStatus === 'win') {
             console.log(`${playerController.getActivePlayer().name} wins!`);
         }
         
-        else if (gameboardController.winChecker() === 'tie') {   // If a tie, winChecker returns false so code will run (b/c !). DOESN'T WORK BECAUSE IF NO WINNER NOT OR IS FOUND, WINCHECKER RETURNS UNDEFINED WHICH IS FALSY....
+        else if (winStatus === 'tie') {
             console.log(`It's a tie!`);
-            // Need to add something to play again.
+            // Need to add something to play again, like a prompt or play again button that reloads everything
             // Should all these console.logs be in the win checker? Have win checker return
             // Make something called win messages?
             // console.log(gameboardController.winMessages())??
@@ -200,7 +253,7 @@ const gameController = (function() {
             // But, if it gets to end, message would be updated to it's players turn and returned
         }
         
-        else {                                          // If a winner is not found, winChecker doesn't return anything, so code will run.
+        else {
             playerController.toggleActivePlayer();
             console.log(`${playerController.getActivePlayer().name}'s turn`);
         }
