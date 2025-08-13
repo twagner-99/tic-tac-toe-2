@@ -144,9 +144,9 @@ const playerController = (function() {
     const player2 = createPlayer('Alex', 'O');   // Then can get the names from user input when UI is added.
     let activePlayer = player1;
 
-    console.log(`${activePlayer.name}'s turn`);
+    console.log(`${activePlayer.name}'s turn`); // Initialization message.
 
-    const getActivePlayer = () => activePlayer; // EXPLORE WHY CAN'T BE FUNCT DECLARATION. MAYBE NEED TO RETURN?
+    const getActivePlayer = () => activePlayer;
     
     const toggleActivePlayer = () => {
         activePlayer = (activePlayer === player1) ? player2 : player1;
@@ -186,14 +186,45 @@ const gameController = (function() {
 
 })();
 
+
+const userInterfaceController = (function() {
+    const buildBoard = () => {
+        const container = document.querySelector('#container');
+
+        gameboardController.getBoard().forEach((row) => {
+            row.forEach((column) => {
+                const boardSquare = document.createElement('div');
+                boardSquare.textContent = 'X';  // UPDATE TO COLUMN LATER IF YOU WANT TO REFLECT ACTUAL VALUE
+
+                container.appendChild(boardSquare);
+            })
+        })
+    }
+
+    return {
+        buildBoard,
+    }
+
+})();
+
+// NEED TO ADD A WAY TO PLAY AGAIN.
+
 // to play, gameController.playRound(row, column)
 
-// gameController.playRound(0, 0)
-// gameController.playRound(0, 1)
-// gameController.playRound(0, 2)
-// gameController.playRound(1, 1)
-// gameController.playRound(1, 0)
-// gameController.playRound(1, 2)
-// gameController.playRound(2, 2)
-// gameController.playRound(2, 0)
-// gameController.playRound(2, 1)
+// UI PORTION
+    // I want to populate the board with JS, that way if they want a bigger board it can be done
+    // The play again? button should use modals
+    // Starting screen (ONLY INITIAL PLAY, NOT AFTER PLAY AGAIN BUTTON)
+        // Will have a start, or play button. Once clicked, players can enter names and then board populates
+    // player entry inputs should be modals.
+    // Winner and tie announcements should be pop-ups
+
+    // Can I create the grid with CSS grid with a gap? and color in the gap?
+        // would make an easy make shift border if it's possible
+        // otherwise, I'll have to know which squares are external v internal to give them appropriate borders
+
+    // how pass params to event handler?
+        // use regular arrow function with event and then run your other function in that?
+
+        // or try writing the function with e like
+            // function doSomething(e) ... then click, doSomething. maybe that'd work

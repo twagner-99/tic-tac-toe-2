@@ -1,0 +1,9 @@
+#container {
+    height: 500px;
+    width: 500px;
+    border: 1px solid black;
+}
+
+#container div {
+    border: 1px solid black;
+}
