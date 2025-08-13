@@ -190,6 +190,9 @@ const gameController = (function() {
 const userInterfaceController = (function() {
     const buildBoard = () => {
         const container = document.querySelector('#container');
+        const gridSize = gameboardController.getBoard().length;
+        container.style.setProperty('--cell-width', (500 / gridSize) + "px");
+        
 
         gameboardController.getBoard().forEach((row) => {
             row.forEach((column) => {
@@ -206,6 +209,17 @@ const userInterfaceController = (function() {
     }
 
 })();
+
+    function testFunction() {
+        let poop = document.querySelector('.test');
+        poop.style.setProperty("color", "blue");
+    }
+
+    function myFunction() {
+        let declaration = document.querySelector('.test');
+        declaration.style.setProperty('background-color', 'yellow');
+        declaration.style.setProperty('color', 'blue');
+    }
 
 // NEED TO ADD A WAY TO PLAY AGAIN.
 
