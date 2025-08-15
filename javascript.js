@@ -190,19 +190,41 @@ const gameController = (function() {
 const userInterfaceController = (function() {
     const buildBoard = () => {
         const container = document.querySelector('#container');
+        const gameboardSize = container.clientHeight;
+        
         const gridSize = gameboardController.getBoard().length;
-        container.style.setProperty('--cell-width', (500 / gridSize) + "px");
+        container.style.setProperty('--cell-width', (gameboardSize / gridSize) + "px");
         
 
-        gameboardController.getBoard().forEach((row) => {
-            row.forEach((column) => {
+        gameboardController.getBoard().forEach((row, rowIndex) => {
+            row.forEach((column, columnIndex) => {
                 const boardSquare = document.createElement('div');
-                boardSquare.textContent = 'X';  // UPDATE TO COLUMN LATER IF YOU WANT TO REFLECT ACTUAL VALUE
+
+                boardSquare.dataset.row = rowIndex;
+                boardSquare.dataset.column = columnIndex;
+
+                boardSquare.addEventListener('click', () => {
+                    gameController.playRound
+                })
+
+                boardSquare.textContent = 'X';  // UPDATE LATER IF YOU WANT TO REFLECT ACTUAL VALUE
 
                 container.appendChild(boardSquare);
             })
         })
     }
+
+    const clickHandler = () => {
+        const boardSquares = document.querySelectorAll('#container > div')
+        boardSquares.forEach((square) => {
+            square
+            square.addEventListener('click', () => {
+                gameController.playRound
+            })
+        })
+    }
+
+
 
     return {
         buildBoard,
@@ -222,7 +244,7 @@ const userInterfaceController = (function() {
     // player entry inputs should be modals.
     // Winner and tie announcements should be pop-ups
 
-    // Can I create the grid with CSS grid with a gap? and color in the gap?
+    // Can I create the grid with CSS grid with a gap? and color in the gap? (make container background black, add a gap, make square divs background white?)
         // would make an easy make shift border if it's possible
         // otherwise, I'll have to know which squares are external v internal to give them appropriate borders
 
