@@ -210,27 +210,19 @@ const userInterfaceController = (function() {
                     boardSquare.textContent = gameboardController.getBoard()[e.target.dataset.row][e.target.dataset.column];
                 })
 
-                // boardSquare.textContent = 'X';  // UPDATE LATER IF YOU WANT TO REFLECT ACTUAL VALUE
-
                 container.appendChild(boardSquare);
             })
         })
     }
-
-    const displayBoard = () => {
-        gameboardController.getBoardValue()
-    }
-    const clickHandler = (element) => {
-        // not sure if keeping this...
-    }
-
-
 
     return {
         buildBoard,
     }
 
 })();
+
+const playBtn = document.querySelector('#playBtn');
+playBtn.addEventListener('click', userInterfaceController.buildBoard);
 
 // NEED TO ADD A WAY TO PLAY AGAIN.
 
