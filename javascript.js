@@ -1,5 +1,6 @@
 const gameboardController = (function() {
     let board = [];
+    let value;
     const rowsAndColumnsCount = 3;
     
     for (let i = 0; i < rowsAndColumnsCount; i++) {
@@ -13,6 +14,7 @@ const gameboardController = (function() {
 
     const updateBoard = (row, column, marker) => {
         board[row][column] = marker;
+
     }
 
     const winChecker = () => {  
@@ -203,25 +205,23 @@ const userInterfaceController = (function() {
                 boardSquare.dataset.row = rowIndex;
                 boardSquare.dataset.column = columnIndex;
 
-                boardSquare.addEventListener('click', () => {
-                    gameController.playRound
+                boardSquare.addEventListener('click', (e) => {
+                    gameController.playRound(e.target.dataset.row, e.target.dataset.column)
+                    boardSquare.textContent = gameboardController.getBoard()[e.target.dataset.row][e.target.dataset.column];
                 })
 
-                boardSquare.textContent = 'X';  // UPDATE LATER IF YOU WANT TO REFLECT ACTUAL VALUE
+                // boardSquare.textContent = 'X';  // UPDATE LATER IF YOU WANT TO REFLECT ACTUAL VALUE
 
                 container.appendChild(boardSquare);
             })
         })
     }
 
-    const clickHandler = () => {
-        const boardSquares = document.querySelectorAll('#container > div')
-        boardSquares.forEach((square) => {
-            square
-            square.addEventListener('click', () => {
-                gameController.playRound
-            })
-        })
+    const displayBoard = () => {
+        gameboardController.getBoardValue()
+    }
+    const clickHandler = (element) => {
+        // not sure if keeping this...
     }
 
 
