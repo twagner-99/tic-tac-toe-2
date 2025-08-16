@@ -146,8 +146,6 @@ const playerController = (function() {
     const player2 = createPlayer('Alex', 'O');   // Then can get the names from user input when UI is added.
     let activePlayer = player1;
 
-    console.log(`${activePlayer.name}'s turn`); // Initialization message.
-
     const getActivePlayer = () => activePlayer;
     
     const toggleActivePlayer = () => {
@@ -190,7 +188,20 @@ const gameController = (function() {
 
 
 const userInterfaceController = (function() {
+    const playDialog = document.querySelector('#playDialog');
+    playDialog.showModal();
+    
+    const playBtn = document.querySelector('#playBtn');
+    playBtn.addEventListener('click', () => {
+        userInterfaceController.buildBoard();
+        playDialog.close();
+    });
+
     const buildBoard = () => {
+        const turnIndicator = document.createElement('p');
+        turnIndicator.textContent = `${playerController.getActivePlayer().name}'s turn`;
+        turnIndicatorContainer.appendChild(turnIndicator);
+
         const container = document.querySelector('#container');
         const gameboardSize = container.clientHeight;
         
@@ -205,9 +216,10 @@ const userInterfaceController = (function() {
                 boardSquare.dataset.row = rowIndex;
                 boardSquare.dataset.column = columnIndex;
 
-                boardSquare.addEventListener('click', (e) => {
-                    gameController.playRound(e.target.dataset.row, e.target.dataset.column)
+                boardSquare.addEventListener('click', (e) => { // consider making this a separate function
+                    gameController.playRound(e.target.dataset.row, e.target.dataset.column);
                     boardSquare.textContent = gameboardController.getBoard()[e.target.dataset.row][e.target.dataset.column];
+                    turnIndicator.textContent = `${playerController.getActivePlayer().name}'s turn`;
                 })
 
                 container.appendChild(boardSquare);
@@ -221,10 +233,13 @@ const userInterfaceController = (function() {
 
 })();
 
-const playBtn = document.querySelector('#playBtn');
-playBtn.addEventListener('click', userInterfaceController.buildBoard);
+
+
+// should this go into an IIFE that doesn't return anything to keep it clean?
 
 // NEED TO ADD A WAY TO PLAY AGAIN.
+// NEED PLAY BUTTON TO BE ONLY THING ON SCREEN TO START, THEN NEED TO DISAPPEAR AFTER CLICKED
+    // Or it can be a modal that shows up first
 
 // to play, gameController.playRound(row, column)
 
@@ -245,3 +260,6 @@ playBtn.addEventListener('click', userInterfaceController.buildBoard);
 
         // or try writing the function with e like
             // function doSomething(e) ... then click, doSomething. maybe that'd work
+
+// FUTURE CLEANUPS
+    // Update so that winChecker knows when it's a cat's game without users having to fill all cells with markers
