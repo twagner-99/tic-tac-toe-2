@@ -120,8 +120,9 @@ const gameboardController = (function() {
             }
         }
 
-        playerController.toggleActivePlayer();
-        return `${playerController.getActivePlayer().name}'s turn`;
+        // might not need return message if nobody wins
+        // playerController.toggleActivePlayer();
+        return false;
         // Returns message of who won. If nobody wins, it toggles player and says who's turn it is.
         // This works because it will only ever reach the toggle and "players turn" return
         // if no winner or tie is found because of all the return statements.
@@ -177,7 +178,8 @@ const gameController = (function() {
 
     const playRound = (row, column) => {
         placeMarker(row, column);
-        console.log(gameboardController.winChecker());
+        userInterfaceController.winAnnouncer();
+        playerController.toggleActivePlayer();
     }
 
     return {
@@ -188,6 +190,8 @@ const gameController = (function() {
 
 
 const userInterfaceController = (function() {
+    
+// should this go into an IIFE that doesn't return anything to keep it clean?
     const playDialog = document.querySelector('#playDialog');
     playDialog.showModal();
     
@@ -196,6 +200,18 @@ const userInterfaceController = (function() {
         userInterfaceController.buildBoard();
         playDialog.close();
     });
+
+    const winAnnouncer = () => {
+        if (gameboardController.winChecker()) { // If winChecker returns true, i.e. finds a winner and returns a string, do stuff
+            const winDialog = document.querySelector('#winDialog');
+            const winnerPara = document.querySelector('#winnerPara');
+            winnerPara.textContent = gameboardController.winChecker();
+            winDialog.showModal();
+        }
+    }
+
+    const playAgainBtn = document.querySelector('#playAgainBtn');
+    // ADD CLICK EVEN THAT CLEARS EVERYTHING AND REBUILDS BOARD
 
     const buildBoard = () => {
         const turnIndicator = document.createElement('p');
@@ -229,13 +245,11 @@ const userInterfaceController = (function() {
 
     return {
         buildBoard,
+        winAnnouncer,
     }
 
 })();
 
-
-
-// should this go into an IIFE that doesn't return anything to keep it clean?
 
 // NEED TO ADD A WAY TO PLAY AGAIN.
 // NEED PLAY BUTTON TO BE ONLY THING ON SCREEN TO START, THEN NEED TO DISAPPEAR AFTER CLICKED
