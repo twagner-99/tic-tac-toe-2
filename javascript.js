@@ -1,29 +1,27 @@
 const gameboardController = (function() {
     let board = [];
-    let value;
     const rowsAndColumnsCount = 3;
-    
-    for (let i = 0; i < rowsAndColumnsCount; i++) {
-        board[i] = [];
-        for (let j = 0; j < rowsAndColumnsCount; j++) {
-            board[i].push('');
+
+    const buildBoard = () => {
+        for (let i = 0; i < rowsAndColumnsCount; i++) {
+            board[i] = [];
+            for (let j = 0; j < rowsAndColumnsCount; j++) {
+                board[i].push('');
+            }
         }
     }
-
+    
     const getBoard = () => board;
 
     const updateBoard = (row, column, marker) => {
         board[row][column] = marker;
+    }
 
+    const clearBoard = () => {
+        board = [];
     }
 
     const winChecker = () => {  
-        // I defined this here b/c that's where the rows and columns are defined. 
-        // If I put it under gameController, I would need to re-access the rows
-        // and columns variables or read the board again to get that info. Felt 
-        // cleaner to do it this way. And kind of makes sense... winChecker is 
-        // a gameboard reader so it makes sense under gameboardController
-
         // DOWN
         for (let j = 0; j < rowsAndColumnsCount; j++) {
             let markerCountDown = 0;
@@ -120,17 +118,15 @@ const gameboardController = (function() {
             }
         }
 
-        // might not need return message if nobody wins
-        // playerController.toggleActivePlayer();
-        return false;
-        // Returns message of who won. If nobody wins, it toggles player and says who's turn it is.
-        // This works because it will only ever reach the toggle and "players turn" return
-        // if no winner or tie is found because of all the return statements.
+        return false;   // false only returned if no winner or tie is found
+
     }
 
     return {
+        buildBoard,
         getBoard,
         updateBoard,
+        clearBoard,
         winChecker,
     };      
 })();
@@ -197,7 +193,8 @@ const userInterfaceController = (function() {
     
     const playBtn = document.querySelector('#playBtn');
     playBtn.addEventListener('click', () => {
-        userInterfaceController.buildBoard();
+        gameboardController.buildBoard();
+        buildBoardUI();
         playDialog.close();
     });
 
@@ -207,13 +204,20 @@ const userInterfaceController = (function() {
             const winnerPara = document.querySelector('#winnerPara');
             winnerPara.textContent = gameboardController.winChecker();
             winDialog.showModal();
+
+            const playAgainBtn = document.querySelector('#playAgainBtn');
+            playAgainBtn.addEventListener('click', () => {
+                gameboardController.clearBoard();
+                clearBoardUI();
+                gameboardController.buildBoard();
+                winDialog.close();
+            })
         }
+        
     }
 
-    const playAgainBtn = document.querySelector('#playAgainBtn');
-    // ADD CLICK EVEN THAT CLEARS EVERYTHING AND REBUILDS BOARD
 
-    const buildBoard = () => {
+    const buildBoardUI = () => {
         const turnIndicator = document.createElement('p');
         turnIndicator.textContent = `${playerController.getActivePlayer().name}'s turn`;
         turnIndicatorContainer.appendChild(turnIndicator);
@@ -243,8 +247,15 @@ const userInterfaceController = (function() {
         })
     }
 
+    const clearBoardUI = () => {
+        const boardSquares = document.querySelectorAll('#container div');
+
+        for (const boardSquare of boardSquares) {
+            boardSquare.textContent = '';
+        }
+    }
+
     return {
-        buildBoard,
         winAnnouncer,
     }
 
