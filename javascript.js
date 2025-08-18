@@ -174,7 +174,7 @@ const gameController = (function() {
 
     const playRound = (row, column) => {
         placeMarker(row, column);
-        userInterfaceController.winAnnouncer();
+        UIController.winAnnouncer();
         playerController.toggleActivePlayer();
     }
 
@@ -185,18 +185,20 @@ const gameController = (function() {
 })();
 
 
-const userInterfaceController = (function() {
-    
-// should this go into an IIFE that doesn't return anything to keep it clean?
-    const playDialog = document.querySelector('#playDialog');
-    playDialog.showModal();
-    
-    const playBtn = document.querySelector('#playBtn');
-    playBtn.addEventListener('click', () => {
-        gameboardController.buildBoard();
-        buildBoardUI();
-        playDialog.close();
-    });
+const UIController = (function() {
+    const initializePlayDialog = () => {
+        const playDialog = document.querySelector('#playDialog');
+        playDialog.showModal();
+        
+        const playBtn = document.querySelector('#playBtn');
+        playBtn.addEventListener('click', () => {
+            gameboardController.buildBoard();
+            buildBoardUI();
+            playDialog.close();
+        });
+    }
+
+    initializePlayDialog();
 
     const winAnnouncer = () => {
         if (gameboardController.winChecker()) { // If winChecker returns true, i.e. finds a winner and returns a string, do stuff
@@ -216,8 +218,7 @@ const userInterfaceController = (function() {
         
     }
 
-
-    const buildBoardUI = () => {
+    const buildBoardUI = () => {    // Only runs one time - when play button is clicked.
         const turnIndicator = document.createElement('p');
         turnIndicator.textContent = `${playerController.getActivePlayer().name}'s turn`;
         turnIndicatorContainer.appendChild(turnIndicator);
