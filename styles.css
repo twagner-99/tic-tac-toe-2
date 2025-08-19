@@ -1,4 +1,4 @@
-#container {    
+#gameboardContainer {    
     height: 500px;
     width: 500px;
     border: 1px solid black;
@@ -7,7 +7,7 @@
     grid-auto-rows: var(--cell-width);
 }
 
-#container > div {
+#gameboardContainer > div {
     border: 1px solid black;
     display: grid;
     place-items: center;

@@ -21,6 +21,30 @@ const gameboardController = (function() {
         board = [];
     }
 
+    let player1WinCount = 0;
+    let player2WinCount = 0;
+    let tieCount = 0;
+    const winCounter = () => {
+        if (playerController.getActivePlayer() === playerController.players.player1) {
+            player1WinCount++;
+        }
+
+        else if (playerController.getActivePlayer() === playerController.players.player2) {
+            player2WinCount++;
+        }
+
+        else {
+            tieCount++;
+        }
+    }
+
+    const getWinCounts = () => {
+        return {player1WinCount,
+                player2WinCount,
+                tieCount,
+        };
+    }
+
     const winChecker = () => {  
         // DOWN
         for (let j = 0; j < rowsAndColumnsCount; j++) {
@@ -32,6 +56,7 @@ const gameboardController = (function() {
                     markerCountDown++;
 
                     if (markerCountDown === (rowsAndColumnsCount - 1)) {
+                        winCounter()
                         return `${playerController.getActivePlayer().playerName} wins!`;
                     }
                 }
@@ -52,6 +77,7 @@ const gameboardController = (function() {
                     markerCountAcross++;
 
                     if (markerCountAcross === (rowsAndColumnsCount - 1)) {
+                        winCounter();
                         return `${playerController.getActivePlayer().playerName} wins!`;
                     }
                 }
@@ -72,6 +98,7 @@ const gameboardController = (function() {
                 markerCountDiag1++;
 
                 if (markerCountDiag1 === (rowsAndColumnsCount - 1)) {
+                    winCounter();
                     return `${playerController.getActivePlayer().playerName} wins!`;
                 }
             }
@@ -91,6 +118,7 @@ const gameboardController = (function() {
                 markerCountDiag2++;
 
                 if (markerCountDiag2 === (rowsAndColumnsCount - 1)) {
+                    winCounter();
                     return `${playerController.getActivePlayer().playerName} wins!`;
                 }
             }
@@ -108,6 +136,7 @@ const gameboardController = (function() {
                     markerCountTie++;
 
                     if (markerCountTie === (rowsAndColumnsCount * rowsAndColumnsCount)) {
+                        winCounter();
                         return `It's a tie!`;
                     }
                 }
@@ -128,6 +157,8 @@ const gameboardController = (function() {
         updateBoard,
         clearBoard,
         winChecker,
+        winCounter,
+        getWinCounts,
     };      
 })();
 
@@ -164,19 +195,17 @@ const gameController = (function() {
     const placeMarker = (row, column) => {
         if (!gameboardController.getBoard()[row][column]) { // If value is empty string, do stuff
             gameboardController.updateBoard(row, column, playerController.getActivePlayer().marker);
-
-            console.log(gameboardController.getBoard());
         }
 
         else {
-            console.log('Space already occupied, go again.');
+            console.log('Space already occupied, go again.');   // need modal popup
             playerController.toggleActivePlayer();
         }
     }
 
     const playRound = (row, column) => {
         placeMarker(row, column);
-        UIController.winAnnouncer();
+        UIController.winAnnouncerUI();
         playerController.toggleActivePlayer();
     }
 
@@ -196,7 +225,8 @@ const UIController = (function() {
         const winDialog = document.querySelector('#winDialog');
         const winnerPara = document.querySelector('#winnerPara');
         const playAgainBtn = document.querySelector('#playAgainBtn');
-        const container = document.querySelector('#container');
+        const gameboardContainer = document.querySelector('#gameboardContainer');
+        const turnIndicatorContainer = document.querySelector('#turnIndicatorContainer');
     }
 
     getExistingElements(); // Doing this syntax instead of making it an IIFE so it's more readable. Easier to miss an IIFE.
@@ -231,59 +261,85 @@ const UIController = (function() {
         }
     }
 
-    const winAnnouncer = () => {
+    const buildPlayAgainUI = () => {
+        playAgainBtn.addEventListener('click', () => {
+            gameboardController.clearBoard();
+            clearBoardUI();
+            gameboardController.buildBoard();
+            winDialog.close();
+        })
+    }
+
+    const winAnnouncerUI = () => {
         if (gameboardController.winChecker()) { // If winChecker returns true, i.e. finds a winner and returns a string, do stuff
             winnerPara.textContent = gameboardController.winChecker();
             winDialog.showModal();
-
-            playAgainBtn.addEventListener('click', () => {
-                gameboardController.clearBoard();
-                clearBoardUI();
-                gameboardController.buildBoard();
-                winDialog.close();
-            })
         }
     }
 
-    const buildBoardUI = () => {    // Only runs one time - when play button is clicked.
+    const buildScoreCardUI = () => {
+        const scoreCard = document.createElement('p');
+        scoreCard.innerText = `Player1: ${gameboardController.getWinCounts().player1WinCount}
+                                 Player2: ${gameboardController.getWinCounts().player2WinCount}
+                                 Ties: ${gameboardController.getWinCounts().tieCount}`;
+        turnIndicatorContainer.appendChild(scoreCard);
+    }
+
+    const buildTurnIndicatorUI = () => {
         const turnIndicator = document.createElement('p');
+        turnIndicator.id = 'turnIndicator';
         turnIndicator.textContent = `${playerController.getActivePlayer().playerName}'s turn`;
         turnIndicatorContainer.appendChild(turnIndicator);
+    }
 
+    const buildResetBtnUI = () => {
         const resetBtn = document.createElement('button')
         resetBtn.id = 'resetBtn';
         resetBtn.textContent = 'Reset';
         resetBtn.addEventListener('click', () => {
             location.reload()
         });
-        
         turnIndicatorContainer.appendChild(resetBtn);
+    }
 
-        const gameboardSize = container.clientHeight;
-        
-        const gridSize = gameboardController.getBoard().length;
-        container.style.setProperty('--cell-width', (gameboardSize / gridSize) + "px");
-
+    const buildBoardSquaresUI = () => {
         gameboardController.getBoard().forEach((row, rowIndex) => {
             row.forEach((column, columnIndex) => {
                 const boardSquare = document.createElement('div');
-
+    
                 boardSquare.dataset.row = rowIndex;
                 boardSquare.dataset.column = columnIndex;
-
+    
                 boardSquare.addEventListener('click', (e) => { // consider making this a separate function
                     gameController.playRound(e.target.dataset.row, e.target.dataset.column);
                     boardSquare.textContent = gameboardController.getBoard()[e.target.dataset.row][e.target.dataset.column];
+                    const turnIndicator = document.querySelector('#turnIndicator');
                     turnIndicator.textContent = `${playerController.getActivePlayer().playerName}'s turn`;
                 })
-
-                container.appendChild(boardSquare);
+    
+                gameboardContainer.appendChild(boardSquare);
             })
         })
     }
 
+    const buildBoardGrid = () => {
+        const gameboardSize = gameboardContainer.clientHeight;
+        
+        const gridSize = gameboardController.getBoard().length;
+        gameboardContainer.style.setProperty('--cell-width', (gameboardSize / gridSize) + "px");
+    }
+
+    const buildBoardUI = () => {    // Only runs one time - when play button is clicked.
+        buildTurnIndicatorUI();
+        buildResetBtnUI();
+        buildPlayAgainUI();
+        buildScoreCardUI();
+        buildBoardSquaresUI();
+        buildBoardGrid();
+    }
+
     const clearBoardUI = () => {
-        const boardSquares = document.querySelectorAll('#container div');
+        const boardSquares = document.querySelectorAll('#gameboardContainer div');
 
         for (const boardSquare of boardSquares) {
             boardSquare.textContent = '';
@@ -291,7 +347,7 @@ const UIController = (function() {
     }
 
     return {
-        winAnnouncer,
+        winAnnouncerUI,
         playerInfoUI,
     }
 
