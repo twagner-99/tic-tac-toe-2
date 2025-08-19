@@ -231,34 +231,25 @@ const UIController = (function() {
 
     getExistingElements(); // Doing this syntax instead of making it an IIFE so it's more readable. Easier to miss an IIFE.
 
-    const playGameUI = () => {
+    const playBtnUI = () => {       // Need to update modal background to white opaque so you can't see anything until play is clicked.
         playDialog.showModal();
         
         playBtn.addEventListener('click', () => {
             playDialog.close();
             playerInfoDialog.showModal();
-            playerInfoUI();
         });
     }
 
-    playGameUI();
+    playBtnUI();    // Initialize so this is first thing user sees.
     
-    const playerInfoUI = () => {
-        let playerName1;
-        let playerName2;
-        
+    const buildPlayerInfoUI = () => {        
         playerInfoSubmitBtn.addEventListener('click', () => {
             playerController.players.player1.playerName = document.querySelector('#playerName1').value;
             playerController.players.player2.playerName = document.querySelector('#playerName2').value;
-            gameboardController.buildBoard();
-            buildBoardUI();
+            // gameboardController.buildBoard();
+            // buildBoardUI();
             playerInfoDialog.close();
         })
-        
-        return {
-            playerName1,
-            playerName2,
-        }
     }
 
     const buildPlayAgainUI = () => {
@@ -329,15 +320,6 @@ const UIController = (function() {
         gameboardContainer.style.setProperty('--cell-width', (gameboardSize / gridSize) + "px");
     }
 
-    const buildBoardUI = () => {    // Only runs one time - when play button is clicked.
-        buildTurnIndicatorUI();
-        buildResetBtnUI();
-        buildPlayAgainUI();
-        buildScoreCardUI();
-        buildBoardSquaresUI();
-        buildBoardGrid();
-    }
-
     const clearBoardUI = () => {
         const boardSquares = document.querySelectorAll('#gameboardContainer div');
 
@@ -346,9 +328,21 @@ const UIController = (function() {
         }
     }
 
+    const buildBoardUI = () => {
+        buildTurnIndicatorUI();
+        buildResetBtnUI();
+        buildPlayAgainUI();
+        buildPlayerInfoUI();
+        buildScoreCardUI();
+        buildBoardSquaresUI();
+        buildBoardGrid();
+    }
+
+    gameboardController.buildBoard();
+    buildBoardUI();
+
     return {
-        winAnnouncerUI,
-        playerInfoUI,
+        winAnnouncerUI,     // This feels kinda backwards (passing UI to playRound). Investigate.
     }
 
 })();
