@@ -188,26 +188,34 @@ const gameController = (function() {
 
 
 const UIController = (function() {
-    const playerInfoDialog = document.querySelector('#playerInfoDialog'); // move this stuff into a query selector function?
+    const getExistingElements = () => {
+        const playerInfoDialog = document.querySelector('#playerInfoDialog'); // move this stuff into a query selector function?
+        const playDialog = document.querySelector('#playDialog');
+        const playBtn = document.querySelector('#playBtn');
+        const playerInfoSubmitBtn = document.querySelector('#playerInfoSubmitBtn');
+        const winDialog = document.querySelector('#winDialog');
+        const winnerPara = document.querySelector('#winnerPara');
+        const playAgainBtn = document.querySelector('#playAgainBtn');
+        const container = document.querySelector('#container');
+    }
+
+    getExistingElements(); // Doing this syntax instead of making it an IIFE so it's more readable. Easier to miss an IIFE.
 
     const playGameUI = () => {
-        const playDialog = document.querySelector('#playDialog');
         playDialog.showModal();
         
-        const playBtn = document.querySelector('#playBtn');
-
         playBtn.addEventListener('click', () => {
             playDialog.close();
             playerInfoDialog.showModal();
             playerInfoUI();
         });
     }
+
+    playGameUI();
     
     const playerInfoUI = () => {
         let playerName1;
         let playerName2;
-        
-        const playerInfoSubmitBtn = document.querySelector('#playerInfoSubmitBtn');
         
         playerInfoSubmitBtn.addEventListener('click', () => {
             playerController.players.player1.playerName = document.querySelector('#playerName1').value;
@@ -223,16 +231,11 @@ const UIController = (function() {
         }
     }
 
-    playGameUI();
-
     const winAnnouncer = () => {
         if (gameboardController.winChecker()) { // If winChecker returns true, i.e. finds a winner and returns a string, do stuff
-            const winDialog = document.querySelector('#winDialog');
-            const winnerPara = document.querySelector('#winnerPara'); // move this stuff into a query selector function?
             winnerPara.textContent = gameboardController.winChecker();
             winDialog.showModal();
 
-            const playAgainBtn = document.querySelector('#playAgainBtn'); // move this stuff into a query selector function?
             playAgainBtn.addEventListener('click', () => {
                 gameboardController.clearBoard();
                 clearBoardUI();
@@ -240,7 +243,6 @@ const UIController = (function() {
                 winDialog.close();
             })
         }
-        
     }
 
     const buildBoardUI = () => {    // Only runs one time - when play button is clicked.
@@ -248,12 +250,10 @@ const UIController = (function() {
         turnIndicator.textContent = `${playerController.getActivePlayer().playerName}'s turn`;
         turnIndicatorContainer.appendChild(turnIndicator);
 
-        const container = document.querySelector('#container');
         const gameboardSize = container.clientHeight;
         
         const gridSize = gameboardController.getBoard().length;
         container.style.setProperty('--cell-width', (gameboardSize / gridSize) + "px");
-        
 
         gameboardController.getBoard().forEach((row, rowIndex) => {
             row.forEach((column, columnIndex) => {
