@@ -32,7 +32,7 @@ const gameboardController = (function() {
                     markerCountDown++;
 
                     if (markerCountDown === (rowsAndColumnsCount - 1)) {
-                        return `${playerController.getActivePlayer().name} wins!`;
+                        return `${playerController.getActivePlayer().playerName} wins!`;
                     }
                 }
                 
@@ -52,7 +52,7 @@ const gameboardController = (function() {
                     markerCountAcross++;
 
                     if (markerCountAcross === (rowsAndColumnsCount - 1)) {
-                        return `${playerController.getActivePlayer().name} wins!`;
+                        return `${playerController.getActivePlayer().playerName} wins!`;
                     }
                 }
                 
@@ -72,7 +72,7 @@ const gameboardController = (function() {
                 markerCountDiag1++;
 
                 if (markerCountDiag1 === (rowsAndColumnsCount - 1)) {
-                    return `${playerController.getActivePlayer().name} wins!`;
+                    return `${playerController.getActivePlayer().playerName} wins!`;
                 }
             }
             
@@ -91,7 +91,7 @@ const gameboardController = (function() {
                 markerCountDiag2++;
 
                 if (markerCountDiag2 === (rowsAndColumnsCount - 1)) {
-                    return `${playerController.getActivePlayer().name} wins!`;
+                    return `${playerController.getActivePlayer().playerName} wins!`;
                 }
             }
             
@@ -132,25 +132,27 @@ const gameboardController = (function() {
 })();
 
 const playerController = (function() {    
-    const createPlayer = (name, marker) => {
-        return {
-            name,
-            marker,
+    const players = {
+        player1: {
+            playerName: 'player1',
+            marker: 'X'
+        },
+        player2: {
+            playerName: 'player2',
+            marker: 'O'
         }
     }
 
-    const player1 = createPlayer('Taylor', 'X'); // Can create these in console later. Can be created within another function.
-    const player2 = createPlayer('Alex', 'O');   // Then can get the names from user input when UI is added.
-    let activePlayer = player1;
+    let activePlayer = players.player1;
 
     const getActivePlayer = () => activePlayer;
     
     const toggleActivePlayer = () => {
-        activePlayer = (activePlayer === player1) ? player2 : player1;
+        activePlayer = (activePlayer === players.player1) ? players.player2 : players.player1;
     }
 
     return {
-        createPlayer,
+        players,
         getActivePlayer,
         toggleActivePlayer,
     }
@@ -186,28 +188,51 @@ const gameController = (function() {
 
 
 const UIController = (function() {
-    const initializePlayDialog = () => {
+    const playerInfoDialog = document.querySelector('#playerInfoDialog'); // move this stuff into a query selector function?
+
+    const playGameUI = () => {
         const playDialog = document.querySelector('#playDialog');
         playDialog.showModal();
         
         const playBtn = document.querySelector('#playBtn');
+
         playBtn.addEventListener('click', () => {
-            gameboardController.buildBoard();
-            buildBoardUI();
             playDialog.close();
+            playerInfoDialog.showModal();
+            playerInfoUI();
         });
     }
+    
+    const playerInfoUI = () => {
+        let playerName1;
+        let playerName2;
+        
+        const playerInfoSubmitBtn = document.querySelector('#playerInfoSubmitBtn');
+        
+        playerInfoSubmitBtn.addEventListener('click', () => {
+            playerController.players.player1.playerName = document.querySelector('#playerName1').value;
+            playerController.players.player2.playerName = document.querySelector('#playerName2').value;
+            gameboardController.buildBoard();
+            buildBoardUI();
+            playerInfoDialog.close();
+        })
+        
+        return {
+            playerName1,
+            playerName2,
+        }
+    }
 
-    initializePlayDialog();
+    playGameUI();
 
     const winAnnouncer = () => {
         if (gameboardController.winChecker()) { // If winChecker returns true, i.e. finds a winner and returns a string, do stuff
             const winDialog = document.querySelector('#winDialog');
-            const winnerPara = document.querySelector('#winnerPara');
+            const winnerPara = document.querySelector('#winnerPara'); // move this stuff into a query selector function?
             winnerPara.textContent = gameboardController.winChecker();
             winDialog.showModal();
 
-            const playAgainBtn = document.querySelector('#playAgainBtn');
+            const playAgainBtn = document.querySelector('#playAgainBtn'); // move this stuff into a query selector function?
             playAgainBtn.addEventListener('click', () => {
                 gameboardController.clearBoard();
                 clearBoardUI();
@@ -220,7 +245,7 @@ const UIController = (function() {
 
     const buildBoardUI = () => {    // Only runs one time - when play button is clicked.
         const turnIndicator = document.createElement('p');
-        turnIndicator.textContent = `${playerController.getActivePlayer().name}'s turn`;
+        turnIndicator.textContent = `${playerController.getActivePlayer().playerName}'s turn`;
         turnIndicatorContainer.appendChild(turnIndicator);
 
         const container = document.querySelector('#container');
@@ -240,7 +265,7 @@ const UIController = (function() {
                 boardSquare.addEventListener('click', (e) => { // consider making this a separate function
                     gameController.playRound(e.target.dataset.row, e.target.dataset.column);
                     boardSquare.textContent = gameboardController.getBoard()[e.target.dataset.row][e.target.dataset.column];
-                    turnIndicator.textContent = `${playerController.getActivePlayer().name}'s turn`;
+                    turnIndicator.textContent = `${playerController.getActivePlayer().playerName}'s turn`;
                 })
 
                 container.appendChild(boardSquare);
@@ -258,34 +283,15 @@ const UIController = (function() {
 
     return {
         winAnnouncer,
+        playerInfoUI,
     }
 
 })();
 
-
-// NEED TO ADD A WAY TO PLAY AGAIN.
-// NEED PLAY BUTTON TO BE ONLY THING ON SCREEN TO START, THEN NEED TO DISAPPEAR AFTER CLICKED
-    // Or it can be a modal that shows up first
-
-// to play, gameController.playRound(row, column)
-
-// UI PORTION
-    // I want to populate the board with JS, that way if they want a bigger board it can be done
-    // The play again? button should use modals
-    // Starting screen (ONLY INITIAL PLAY, NOT AFTER PLAY AGAIN BUTTON)
-        // Will have a start, or play button. Once clicked, players can enter names and then board populates
-    // player entry inputs should be modals.
-    // Winner and tie announcements should be pop-ups
-
+// CSS BRAINSTORM
     // Can I create the grid with CSS grid with a gap? and color in the gap? (make container background black, add a gap, make square divs background white?)
         // would make an easy make shift border if it's possible
         // otherwise, I'll have to know which squares are external v internal to give them appropriate borders
-
-    // how pass params to event handler?
-        // use regular arrow function with event and then run your other function in that?
-
-        // or try writing the function with e like
-            // function doSomething(e) ... then click, doSomething. maybe that'd work
 
 // FUTURE CLEANUPS
     // Update so that winChecker knows when it's a cat's game without users having to fill all cells with markers
