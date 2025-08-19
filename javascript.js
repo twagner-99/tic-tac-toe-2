@@ -250,6 +250,15 @@ const UIController = (function() {
         turnIndicator.textContent = `${playerController.getActivePlayer().playerName}'s turn`;
         turnIndicatorContainer.appendChild(turnIndicator);
 
+        const resetBtn = document.createElement('button')
+        resetBtn.id = 'resetBtn';
+        resetBtn.textContent = 'Reset';
+        resetBtn.addEventListener('click', () => {
+            location.reload()
+        });
+        
+        turnIndicatorContainer.appendChild(resetBtn);
+
         const gameboardSize = container.clientHeight;
         
         const gridSize = gameboardController.getBoard().length;
