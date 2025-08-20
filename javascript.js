@@ -2,12 +2,11 @@ const gameboardController = (function() {
     let board = [];
     const rowsAndColumnsCount = 3;
 
-    const buildBoard = () => {
-        for (let i = 0; i < rowsAndColumnsCount; i++) {
-            board[i] = [];
-            for (let j = 0; j < rowsAndColumnsCount; j++) {
-                board[i].push('');
-            }
+// Build board
+    for (let i = 0; i < rowsAndColumnsCount; i++) {
+        board[i] = [];
+        for (let j = 0; j < rowsAndColumnsCount; j++) {
+            board[i].push('');
         }
     }
     
@@ -17,10 +16,15 @@ const gameboardController = (function() {
         board[row][column] = marker;
     }
 
-    const clearBoard = () => {
-        board = [];
+    const resetBoardValues = () => {
+        board.forEach((row, rowIndex) => {
+            row.forEach((column, columnIndex) => {
+                board[rowIndex][columnIndex] = '';
+            })
+        })
     }
 
+    // All this should go in it's own IIFE
     let player1WinCount = 0;
     let player2WinCount = 0;
     let tieCount = 0;
@@ -99,8 +103,8 @@ const gameboardController = (function() {
 
                 if (markerCountDiag1 === (rowsAndColumnsCount - 1)) {
                     winCounter();
-                    return `${playerController.getActivePlayer().playerName} wins!`;
-                }
+                    return `${playerController.getActivePlayer().playerName} wins!`; // IDEA. VARIABLE CALLED WINNER THAT GETS UPDATED DEPENDING. THEN USE THAT VALUE IN UI SECTION TO DO DIFFERENT THINGS
+                }                                                                      // THEN MAYBE WINCOUNTER AND UPDATING INNERTEXT WILL WORK
             }
             
             else {
@@ -152,10 +156,9 @@ const gameboardController = (function() {
     }
 
     return {
-        buildBoard,
         getBoard,
         updateBoard,
-        clearBoard,
+        resetBoardValues,
         winChecker,
         winCounter,
         getWinCounts,
@@ -205,7 +208,7 @@ const gameController = (function() {
 
     const playRound = (row, column) => {
         placeMarker(row, column);
-        UIController.winAnnouncerUI();
+        UIController.winAnnouncerUI();  // Investigate whether it's backwards or not to be passing a UI function to playRound
         playerController.toggleActivePlayer();
     }
 
@@ -217,50 +220,75 @@ const gameController = (function() {
 
 
 const UIController = (function() {
-    const getExistingElements = () => {
-        const playerInfoDialog = document.querySelector('#playerInfoDialog'); // move this stuff into a query selector function?
-        const playDialog = document.querySelector('#playDialog');
-        const playBtn = document.querySelector('#playBtn');
-        const playerInfoSubmitBtn = document.querySelector('#playerInfoSubmitBtn');
-        const winDialog = document.querySelector('#winDialog');
-        const winnerPara = document.querySelector('#winnerPara');
-        const playAgainBtn = document.querySelector('#playAgainBtn');
-        const gameboardContainer = document.querySelector('#gameboardContainer');
-        const turnIndicatorContainer = document.querySelector('#turnIndicatorContainer');
-    }
+// Get Existing HTML Elements
+    const playerInfoDialog = document.querySelector('#playerInfoDialog');
+    const playDialog = document.querySelector('#playDialog');
+    const playBtn = document.querySelector('#playBtn');
+    const playerInfoSubmitBtn = document.querySelector('#playerInfoSubmitBtn');
+    const winDialog = document.querySelector('#winDialog');
+    const winnerPara = document.querySelector('#winnerPara');
+    const playAgainBtn = document.querySelector('#playAgainBtn');
+    const gameboardContainer = document.querySelector('#gameboardContainer');
+    const turnIndicatorContainer = document.querySelector('#turnIndicatorContainer');
 
-    getExistingElements(); // Doing this syntax instead of making it an IIFE so it's more readable. Easier to miss an IIFE.
+// Create New HTML Elements
+    const turnIndicator = document.createElement('p');
+    turnIndicatorContainer.appendChild(turnIndicator);
 
-    const playBtnUI = () => {       // Need to update modal background to white opaque so you can't see anything until play is clicked.
-        playDialog.showModal();
-        
-        playBtn.addEventListener('click', () => {
-            playDialog.close();
-            playerInfoDialog.showModal();
-        });
-    }
+    const scoreCard = document.createElement('p');
+    turnIndicatorContainer.appendChild(scoreCard);
 
-    playBtnUI();    // Initialize so this is first thing user sees.
+    const resetBtn = document.createElement('button');
+    resetBtn.textContent = 'Reset';
+    resetBtn.addEventListener('click', () => {
+        location.reload()
+    });
+    turnIndicatorContainer.appendChild(resetBtn);
+
+    gameboardController.getBoard().forEach((row, rowIndex) => {
+        row.forEach((column, columnIndex) => {
+            const boardSquare = document.createElement('div');
+
+            boardSquare.dataset.row = rowIndex;
+            boardSquare.dataset.column = columnIndex;
+
+            boardSquare.addEventListener('click', (e) => {
+                gameController.playRound(e.target.dataset.row, e.target.dataset.column);
+                boardSquare.textContent = gameboardController.getBoard()[e.target.dataset.row][e.target.dataset.column];
+                updateTurnIndicator();
+            })
+            gameboardContainer.appendChild(boardSquare);
+        })
+    })
     
-    const buildPlayerInfoUI = () => {        
-        playerInfoSubmitBtn.addEventListener('click', () => {
-            playerController.players.player1.playerName = document.querySelector('#playerName1').value;
-            playerController.players.player2.playerName = document.querySelector('#playerName2').value;
-            // gameboardController.buildBoard();
-            // buildBoardUI();
-            playerInfoDialog.close();
-        })
-    }
+    
+// Add additional event handlers
+    playBtn.addEventListener('click', () => {
+        playDialog.close();
+        playerInfoDialog.showModal();
+    });
+    
+    playerInfoSubmitBtn.addEventListener('click', () => {
+        playerController.players.player1.playerName = document.querySelector('#playerName1').value;
+        playerController.players.player2.playerName = document.querySelector('#playerName2').value;
+        updateTurnIndicator();
+        updateScoreCard();
+        playerInfoDialog.close();
+    })
+    
+    playAgainBtn.addEventListener('click', () => {
+        gameboardController.resetBoardValues();
+        clearBoardUI();
+        winDialog.close();
+    })
+    
+// Build board grid
+    const gameboardSize = gameboardContainer.clientHeight;
+    const gridSize = gameboardController.getBoard().length;
+    gameboardContainer.style.setProperty('--cell-width', (gameboardSize / gridSize) + "px");
 
-    const buildPlayAgainUI = () => {
-        playAgainBtn.addEventListener('click', () => {
-            gameboardController.clearBoard();
-            clearBoardUI();
-            gameboardController.buildBoard();
-            winDialog.close();
-        })
-    }
 
+// Create additional functions
     const winAnnouncerUI = () => {
         if (gameboardController.winChecker()) { // If winChecker returns true, i.e. finds a winner and returns a string, do stuff
             winnerPara.textContent = gameboardController.winChecker();
@@ -268,56 +296,14 @@ const UIController = (function() {
         }
     }
 
-    const buildScoreCardUI = () => {
-        const scoreCard = document.createElement('p');
+    const updateScoreCard = () => {
         scoreCard.innerText = `Player1: ${gameboardController.getWinCounts().player1WinCount}
-                                 Player2: ${gameboardController.getWinCounts().player2WinCount}
-                                 Ties: ${gameboardController.getWinCounts().tieCount}`;
-        turnIndicatorContainer.appendChild(scoreCard);
+                                Player2: ${gameboardController.getWinCounts().player2WinCount}
+                                Ties: ${gameboardController.getWinCounts().tieCount}`;
     }
 
-    const buildTurnIndicatorUI = () => {
-        const turnIndicator = document.createElement('p');
-        turnIndicator.id = 'turnIndicator';
+    const updateTurnIndicator = () => {
         turnIndicator.textContent = `${playerController.getActivePlayer().playerName}'s turn`;
-        turnIndicatorContainer.appendChild(turnIndicator);
-    }
-
-    const buildResetBtnUI = () => {
-        const resetBtn = document.createElement('button')
-        resetBtn.id = 'resetBtn';
-        resetBtn.textContent = 'Reset';
-        resetBtn.addEventListener('click', () => {
-            location.reload()
-        });
-        turnIndicatorContainer.appendChild(resetBtn);
-    }
-
-    const buildBoardSquaresUI = () => {
-        gameboardController.getBoard().forEach((row, rowIndex) => {
-            row.forEach((column, columnIndex) => {
-                const boardSquare = document.createElement('div');
-    
-                boardSquare.dataset.row = rowIndex;
-                boardSquare.dataset.column = columnIndex;
-    
-                boardSquare.addEventListener('click', (e) => { // consider making this a separate function
-                    gameController.playRound(e.target.dataset.row, e.target.dataset.column);
-                    boardSquare.textContent = gameboardController.getBoard()[e.target.dataset.row][e.target.dataset.column];
-                    const turnIndicator = document.querySelector('#turnIndicator');
-                    turnIndicator.textContent = `${playerController.getActivePlayer().playerName}'s turn`;
-                })
-    
-                gameboardContainer.appendChild(boardSquare);
-            })
-        })
-    }
-
-    const buildBoardGrid = () => {
-        const gameboardSize = gameboardContainer.clientHeight;
-        
-        const gridSize = gameboardController.getBoard().length;
-        gameboardContainer.style.setProperty('--cell-width', (gameboardSize / gridSize) + "px");
     }
 
     const clearBoardUI = () => {
@@ -328,18 +314,7 @@ const UIController = (function() {
         }
     }
 
-    const buildBoardUI = () => {
-        buildTurnIndicatorUI();
-        buildResetBtnUI();
-        buildPlayAgainUI();
-        buildPlayerInfoUI();
-        buildScoreCardUI();
-        buildBoardSquaresUI();
-        buildBoardGrid();
-    }
-
-    gameboardController.buildBoard();
-    buildBoardUI();
+    playDialog.showModal();
 
     return {
         winAnnouncerUI,     // This feels kinda backwards (passing UI to playRound). Investigate.
@@ -354,3 +329,7 @@ const UIController = (function() {
 
 // FUTURE CLEANUPS
     // Update so that winChecker knows when it's a cat's game without users having to fill all cells with markers
+
+// CURRENT CLEANUPS
+    // FIX SCORE COUNTER
+    // MESSAGE FOR ALREADY OCCUPIED SPACE NEEDS TO BE A MODAL
