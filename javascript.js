@@ -1,8 +1,8 @@
 const gameboardController = (function() {
+// Build board
     let board = [];
     const rowsAndColumnsCount = 3;
 
-// Build board
     for (let i = 0; i < rowsAndColumnsCount; i++) {
         board[i] = [];
         for (let j = 0; j < rowsAndColumnsCount; j++) {
@@ -10,6 +10,7 @@ const gameboardController = (function() {
         }
     }
     
+// Create functions
     const getBoard = () => board;
 
     const updateBoard = (row, column, marker) => {
@@ -24,42 +25,53 @@ const gameboardController = (function() {
         })
     }
 
-    // All this should go in it's own IIFE
+    
+    return {
+        getBoard,
+        updateBoard,
+        resetBoardValues,
+    };      
+})();
+
+const winController = (function() {
     let player1WinCount = 0;
     let player2WinCount = 0;
     let tieCount = 0;
+
     const winCounter = () => {
         if (playerController.getActivePlayer() === playerController.players.player1) {
             player1WinCount++;
         }
-
+    
         else if (playerController.getActivePlayer() === playerController.players.player2) {
             player2WinCount++;
         }
-
+    
         else {
             tieCount++;
         }
     }
-
+    
     const getWinCounts = () => {
         return {player1WinCount,
                 player2WinCount,
                 tieCount,
         };
     }
-
+    
     const winChecker = () => {  
+        const rowsAndColumnsRead = gameboardController.getBoard().length;
+        const board = gameboardController.getBoard()
         // DOWN
-        for (let j = 0; j < rowsAndColumnsCount; j++) {
+        for (let j = 0; j < rowsAndColumnsRead; j++) {
             let markerCountDown = 0;
             let currentMarker = board[0][j];
-            for (let i = 0; i < (rowsAndColumnsCount - 1); i++) {
+            for (let i = 0; i < (rowsAndColumnsRead - 1); i++) {
                 if (!!currentMarker && currentMarker === board[i + 1][j]) {
                     currentMarker = board[i + 1][j];
                     markerCountDown++;
-
-                    if (markerCountDown === (rowsAndColumnsCount - 1)) {
+    
+                    if (markerCountDown === (rowsAndColumnsRead - 1)) {
                         winCounter()
                         return `${playerController.getActivePlayer().playerName} wins!`;
                     }
@@ -70,17 +82,17 @@ const gameboardController = (function() {
                 }
             }
         }
-
+    
         // ACROSS
-        for (let i = 0; i < rowsAndColumnsCount; i++) {
+        for (let i = 0; i < rowsAndColumnsRead; i++) {
             let markerCountAcross = 0;
             let currentMarker = board[i][0];
-            for (let j = 0; j < (rowsAndColumnsCount - 1); j++) {
+            for (let j = 0; j < (rowsAndColumnsRead - 1); j++) {
                 if (!!currentMarker && currentMarker === board[i][j + 1]) {
                     currentMarker = board[i][j + 1];
                     markerCountAcross++;
-
-                    if (markerCountAcross === (rowsAndColumnsCount - 1)) {
+    
+                    if (markerCountAcross === (rowsAndColumnsRead - 1)) {
                         winCounter();
                         return `${playerController.getActivePlayer().playerName} wins!`;
                     }
@@ -91,17 +103,17 @@ const gameboardController = (function() {
                 }
             }
         }
-
+    
         // DIAGONAL-1
             // [0][0] & [1][1] & [2][2]
         let markerCountDiag1 = 0;
-        for (let i = 0, j = 0; i < (rowsAndColumnsCount - 1); i++, j++) {
+        for (let i = 0, j = 0; i < (rowsAndColumnsRead - 1); i++, j++) {
             let currentMarker = board[i][j];
             if (!!currentMarker && currentMarker === board[i + 1][j + 1]) {
                 currentMarker = board[i + 1][j + 1];
                 markerCountDiag1++;
-
-                if (markerCountDiag1 === (rowsAndColumnsCount - 1)) {
+    
+                if (markerCountDiag1 === (rowsAndColumnsRead - 1)) {
                     winCounter();
                     return `${playerController.getActivePlayer().playerName} wins!`; // IDEA. VARIABLE CALLED WINNER THAT GETS UPDATED DEPENDING. THEN USE THAT VALUE IN UI SECTION TO DO DIFFERENT THINGS
                 }                                                                      // THEN MAYBE WINCOUNTER AND UPDATING INNERTEXT WILL WORK
@@ -111,17 +123,17 @@ const gameboardController = (function() {
                 break;
             }
         }
-
+    
         // DIAGONAL-2
             // [2][0] & [1][1] & [0][2]
         let markerCountDiag2 = 0;
-        for (let i = 2, j = 0; j < (rowsAndColumnsCount - 1); i--, j++) {
+        for (let i = 2, j = 0; j < (rowsAndColumnsRead - 1); i--, j++) {
             let currentMarker = board[i][j];
             if (!!currentMarker && currentMarker === board[i - 1][j + 1]) {
                 currentMarker = board[i - 1][j + 1];
                 markerCountDiag2++;
-
-                if (markerCountDiag2 === (rowsAndColumnsCount - 1)) {
+    
+                if (markerCountDiag2 === (rowsAndColumnsRead - 1)) {
                     winCounter();
                     return `${playerController.getActivePlayer().playerName} wins!`;
                 }
@@ -131,15 +143,15 @@ const gameboardController = (function() {
                 break;
             }
         }
-
+    
         // TIE
         let markerCountTie = 0;
         for (let row of board) {
             for (let column of row) {
                 if (!!column) {
                     markerCountTie++;
-
-                    if (markerCountTie === (rowsAndColumnsCount * rowsAndColumnsCount)) {
+    
+                    if (markerCountTie === (rowsAndColumnsRead * rowsAndColumnsRead)) {
                         winCounter();
                         return `It's a tie!`;
                     }
@@ -150,19 +162,17 @@ const gameboardController = (function() {
                 }
             }
         }
-
+    
         return false;   // false only returned if no winner or tie is found
-
+    
     }
 
     return {
-        getBoard,
-        updateBoard,
-        resetBoardValues,
         winChecker,
         winCounter,
         getWinCounts,
-    };      
+    }
+
 })();
 
 const playerController = (function() {    
@@ -290,16 +300,16 @@ const UIController = (function() {
 
 // Create additional functions
     const winAnnouncerUI = () => {
-        if (gameboardController.winChecker()) { // If winChecker returns true, i.e. finds a winner and returns a string, do stuff
-            winnerPara.textContent = gameboardController.winChecker();
+        if (winController.winChecker()) { // If winChecker returns true, i.e. finds a winner and returns a string, do stuff
+            winnerPara.textContent = winController.winChecker();
             winDialog.showModal();
         }
     }
 
     const updateScoreCard = () => {
-        scoreCard.innerText = `Player1: ${gameboardController.getWinCounts().player1WinCount}
-                                Player2: ${gameboardController.getWinCounts().player2WinCount}
-                                Ties: ${gameboardController.getWinCounts().tieCount}`;
+        scoreCard.innerText = `Player1: ${winController.getWinCounts().player1WinCount}
+                                Player2: ${winController.getWinCounts().player2WinCount}
+                                Ties: ${winController.getWinCounts().tieCount}`;
     }
 
     const updateTurnIndicator = () => {
