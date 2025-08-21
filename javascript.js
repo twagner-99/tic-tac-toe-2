@@ -37,38 +37,22 @@ const winController = (function() {
     let player1WinCount = 0;
     let player2WinCount = 0;
     let tieCount = 0;
-    let winnerText;
     let winner;
 
     const winCounter = () => {
-        // if (winner === playerController.players.player1) {
-        //     player1WinCount++;
-        //     winnerText = `${winner.playerName} wins!`;
-        // }
+        if (playerController.getActivePlayer() === playerController.players.player1) {
+            player1WinCount++;
+            winner = `${playerController.getActivePlayer().playerName} wins!`
+        }
     
-        // else if (winner === playerController.players.player2) {
-        //     player2WinCount++;
-        //     `${winner.playerName} wins!`;
-        // }
+        else if (playerController.getActivePlayer() === playerController.players.player2) {
+            player2WinCount++;
+            winner = `${playerController.getActivePlayer().playerName} wins!`
+        }
     
-        // else {
-        //     tieCount++;
-        //     `It's a tie!`
-        // }
-
-        switch(winner) {
-            case playerController.players.player1:
-                player1WinCount++;
-                winnerText = `${winner.playerName} wins!`;
-                break;
-            case playerController.players.player2:
-                player2WinCount++;
-                winnerText = `${winner.playerName} wins!`;
-                break;
-            case 'tie':
-                tieCount++;
-                winnerText = `It's a tie!`;
-                break;
+        else {
+            tieCount++;
+            winner = `Tie!`
         }
     }
     
@@ -76,13 +60,13 @@ const winController = (function() {
         return {player1WinCount,
                 player2WinCount,
                 tieCount,
-                winnerText,
+                winner,
         };
     }
     
     const winChecker = () => {  
         const rowsAndColumnsRead = gameboardController.getBoard().length;
-        const board = gameboardController.getBoard();
+        const board = gameboardController.getBoard()
         // DOWN
         for (let j = 0; j < rowsAndColumnsRead; j++) {
             let markerCountDown = 0;
@@ -93,9 +77,7 @@ const winController = (function() {
                     markerCountDown++;
     
                     if (markerCountDown === (rowsAndColumnsRead - 1)) {
-                        winner = playerController.getActivePlayer();
-                        winCounter();
-                        UIController.updateScoreCard();
+                        winCounter()
                         return true;
                     }
                 }
@@ -116,9 +98,7 @@ const winController = (function() {
                     markerCountAcross++;
     
                     if (markerCountAcross === (rowsAndColumnsRead - 1)) {
-                        winner = playerController.getActivePlayer();
                         winCounter();
-                        UIController.updateScoreCard();
                         return true;
                     }
                 }
@@ -139,11 +119,9 @@ const winController = (function() {
                 markerCountDiag1++;
     
                 if (markerCountDiag1 === (rowsAndColumnsRead - 1)) {
-                    winner = playerController.getActivePlayer();                
                     winCounter();
-                    UIController.updateScoreCard();
                     return true;
-                }
+                }               
             }
             
             else {
@@ -161,9 +139,7 @@ const winController = (function() {
                 markerCountDiag2++;
     
                 if (markerCountDiag2 === (rowsAndColumnsRead - 1)) {
-                    winner = playerController.getActivePlayer();
                     winCounter();
-                    UIController.updateScoreCard();
                     return true;
                 }
             }
@@ -181,10 +157,8 @@ const winController = (function() {
                     markerCountTie++;
     
                     if (markerCountTie === (rowsAndColumnsRead * rowsAndColumnsRead)) {
-                        winner = 'tie';
                         winCounter();
-                        UIController.updateScoreCard();
-                        return;
+                        return true;
                     }
                 }
                 
@@ -331,8 +305,9 @@ const UIController = (function() {
 
 // Create additional functions
     const winAnnouncerUI = () => {
-        if (winController.winChecker()) { // If winChecker returns true, i.e. finds a winner/tie and returns a non-empty string, do stuff
-            winnerPara.textContent = winController.getWinInfo().winnerText; // RE-RUNNING THIS FUNCTION WHEN WE DON'T WANT TO! THIS IS WHY WE HAVE A GET FUNCTION!!!!!
+        if (winController.winChecker()) { // If winChecker returns true, i.e. finds a winner and returns a string, do stuff
+            winnerPara.textContent = winController.getWinInfo().winner;
+            updateScoreCard();
             winDialog.showModal();
         }
     }
@@ -358,8 +333,7 @@ const UIController = (function() {
     playDialog.showModal();
 
     return {
-        winAnnouncerUI,    // This feels kinda backwards (passing UI to playRound). Investigate.
-        updateScoreCard,
+        winAnnouncerUI,     // This feels kinda backwards (passing UI to playRound). Investigate.
     }
 
 })();
