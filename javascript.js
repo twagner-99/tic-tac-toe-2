@@ -37,31 +37,52 @@ const winController = (function() {
     let player1WinCount = 0;
     let player2WinCount = 0;
     let tieCount = 0;
+    let winnerText;
+    let winner;
 
     const winCounter = () => {
-        if (playerController.getActivePlayer() === playerController.players.player1) {
-            player1WinCount++;
-        }
+        // if (winner === playerController.players.player1) {
+        //     player1WinCount++;
+        //     winnerText = `${winner.playerName} wins!`;
+        // }
     
-        else if (playerController.getActivePlayer() === playerController.players.player2) {
-            player2WinCount++;
-        }
+        // else if (winner === playerController.players.player2) {
+        //     player2WinCount++;
+        //     `${winner.playerName} wins!`;
+        // }
     
-        else {
-            tieCount++;
+        // else {
+        //     tieCount++;
+        //     `It's a tie!`
+        // }
+
+        switch(winner) {
+            case playerController.players.player1:
+                player1WinCount++;
+                winnerText = `${winner.playerName} wins!`;
+                break;
+            case playerController.players.player2:
+                player2WinCount++;
+                winnerText = `${winner.playerName} wins!`;
+                break;
+            case 'tie':
+                tieCount++;
+                winnerText = `It's a tie!`;
+                break;
         }
     }
     
-    const getWinCounts = () => {
+    const getWinInfo = () => {
         return {player1WinCount,
                 player2WinCount,
                 tieCount,
+                winnerText,
         };
     }
     
     const winChecker = () => {  
         const rowsAndColumnsRead = gameboardController.getBoard().length;
-        const board = gameboardController.getBoard()
+        const board = gameboardController.getBoard();
         // DOWN
         for (let j = 0; j < rowsAndColumnsRead; j++) {
             let markerCountDown = 0;
@@ -72,8 +93,10 @@ const winController = (function() {
                     markerCountDown++;
     
                     if (markerCountDown === (rowsAndColumnsRead - 1)) {
-                        winCounter()
-                        return `${playerController.getActivePlayer().playerName} wins!`;
+                        winner = playerController.getActivePlayer();
+                        winCounter();
+                        UIController.updateScoreCard();
+                        return true;
                     }
                 }
                 
@@ -93,8 +116,10 @@ const winController = (function() {
                     markerCountAcross++;
     
                     if (markerCountAcross === (rowsAndColumnsRead - 1)) {
+                        winner = playerController.getActivePlayer();
                         winCounter();
-                        return `${playerController.getActivePlayer().playerName} wins!`;
+                        UIController.updateScoreCard();
+                        return true;
                     }
                 }
                 
@@ -114,9 +139,11 @@ const winController = (function() {
                 markerCountDiag1++;
     
                 if (markerCountDiag1 === (rowsAndColumnsRead - 1)) {
+                    winner = playerController.getActivePlayer();                
                     winCounter();
-                    return `${playerController.getActivePlayer().playerName} wins!`; // IDEA. VARIABLE CALLED WINNER THAT GETS UPDATED DEPENDING. THEN USE THAT VALUE IN UI SECTION TO DO DIFFERENT THINGS
-                }                                                                      // THEN MAYBE WINCOUNTER AND UPDATING INNERTEXT WILL WORK
+                    UIController.updateScoreCard();
+                    return true;
+                }
             }
             
             else {
@@ -134,8 +161,10 @@ const winController = (function() {
                 markerCountDiag2++;
     
                 if (markerCountDiag2 === (rowsAndColumnsRead - 1)) {
+                    winner = playerController.getActivePlayer();
                     winCounter();
-                    return `${playerController.getActivePlayer().playerName} wins!`;
+                    UIController.updateScoreCard();
+                    return true;
                 }
             }
             
@@ -152,8 +181,10 @@ const winController = (function() {
                     markerCountTie++;
     
                     if (markerCountTie === (rowsAndColumnsRead * rowsAndColumnsRead)) {
+                        winner = 'tie';
                         winCounter();
-                        return `It's a tie!`;
+                        UIController.updateScoreCard();
+                        return;
                     }
                 }
                 
@@ -163,14 +194,14 @@ const winController = (function() {
             }
         }
     
-        return false;   // false only returned if no winner or tie is found
+        return false;   // false only returned if no winner or no tie is found
     
     }
 
     return {
         winChecker,
         winCounter,
-        getWinCounts,
+        getWinInfo,
     }
 
 })();
@@ -300,16 +331,16 @@ const UIController = (function() {
 
 // Create additional functions
     const winAnnouncerUI = () => {
-        if (winController.winChecker()) { // If winChecker returns true, i.e. finds a winner and returns a string, do stuff
-            winnerPara.textContent = winController.winChecker();
+        if (winController.winChecker()) { // If winChecker returns true, i.e. finds a winner/tie and returns a non-empty string, do stuff
+            winnerPara.textContent = winController.getWinInfo().winnerText; // RE-RUNNING THIS FUNCTION WHEN WE DON'T WANT TO! THIS IS WHY WE HAVE A GET FUNCTION!!!!!
             winDialog.showModal();
         }
     }
 
     const updateScoreCard = () => {
-        scoreCard.innerText = `Player1: ${winController.getWinCounts().player1WinCount}
-                                Player2: ${winController.getWinCounts().player2WinCount}
-                                Ties: ${winController.getWinCounts().tieCount}`;
+        scoreCard.innerText = `Player1: ${winController.getWinInfo().player1WinCount}
+                                Player2: ${winController.getWinInfo().player2WinCount}
+                                Ties: ${winController.getWinInfo().tieCount}`;
     }
 
     const updateTurnIndicator = () => {
@@ -327,7 +358,8 @@ const UIController = (function() {
     playDialog.showModal();
 
     return {
-        winAnnouncerUI,     // This feels kinda backwards (passing UI to playRound). Investigate.
+        winAnnouncerUI,    // This feels kinda backwards (passing UI to playRound). Investigate.
+        updateScoreCard,
     }
 
 })();
